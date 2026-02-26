@@ -10,11 +10,13 @@ export const DELETE = async function (
 ) {
   await dbConnect();
 
-  if (!params.planId)
+  const { planId } = await params;
+
+  if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
   const plan = await PlanModel.findOneAndDelete({
-    _id: params.planId,
+    _id: planId,
   });
 
   if (!plan)
@@ -30,10 +32,12 @@ export const GET = async function (
 ) {
   await dbConnect();
 
-  if (!params.planId)
+  const { planId } = await params;
+
+  if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const plan = await PlanModel.find({ _id: params.planId });
+  const plan = await PlanModel.find({ _id: planId });
 
   if (!plan)
     return NextResponse.json({ message: "Plan not found" }, { status: 404 });

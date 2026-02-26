@@ -11,27 +11,29 @@ export const PUT = async function (
 ) {
   await dbConnect();
 
-  if (!params.planId)
+  const { planId, restaurantId } = await params;
+
+  if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  if (!params.restaurantId)
+  if (!restaurantId)
     return NextResponse.json(
       { message: "Restaurant ID required" },
       { status: 400 },
     );
 
-  const plan = await PlanModel.findOne({ _id: params.planId });
+  const plan = await PlanModel.findOne({ _id: planId });
   if (!plan)
     return NextResponse.json({ message: "Plan not found" }, { status: 404 });
 
-  const restaurant = await PlanModel.findOne({ _id: params.restaurantId });
+  const restaurant = await getRestaurantById(restaurantId);
   if (!restaurant)
     return NextResponse.json(
       { message: "Restaurant not found" },
       { status: 404 },
     );
 
-  plan.restaurants.push(params.restaurantId);
+  plan.restaurants.push(restaurantId);
   await plan.save();
 
   return NextResponse.json(plan, { status: 200 });
@@ -44,17 +46,19 @@ export const DELETE = async function (
 ) {
   await dbConnect();
 
-  if (!params.planId)
+  const { planId, restaurantId } = await params;
+
+  if (!planId)
     return NextResponse.json({ message: "Plan not found" }, { status: 404 });
 
-  if (!params.restaurantId)
+  if (!restaurantId)
     return NextResponse.json(
       { message: "Restaurant not found." },
       { status: 404 },
     );
 
   const isRestaurant =
-    (await getRestaurantById(params.restaurantId as string)) != undefined;
+    (await getRestaurantById(restaurantId as string)) != undefined;
   if (!isRestaurant)
     return NextResponse.json(
       { message: "Restaurant ID is invalid" },
@@ -62,8 +66,8 @@ export const DELETE = async function (
     );
 
   const updatedPlan = await PlanModel.findByIdAndUpdate(
-    params.planId,
-    { $pullAll: { restaurants: params.restaurantId } },
+    planId,
+    { $pullAll: { restaurants: restaurantId } },
     { new: true },
   );
 

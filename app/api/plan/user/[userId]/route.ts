@@ -11,7 +11,9 @@ export const POST = async function (
 ) {
   await dbConnect();
 
-  if (!params.userId)
+  const { userId } = await params;
+
+  if (!userId)
     return NextResponse.json({ message: "User Id required" }, { status: 400 });
 
   const body = await req.json();
@@ -22,8 +24,9 @@ export const POST = async function (
       { status: 400 },
     );
 
-  const isUser = (await getUserById(params.userId)) != undefined;
-  if (!isUser)
+  const user = await getUserById(userId);
+
+  if (!user)
     return NextResponse.json(
       { message: "User ID is invalid" },
       { status: 400 },
@@ -31,7 +34,7 @@ export const POST = async function (
 
   const plan = await PlanModel.create({
     name,
-    creatorId: params.userId,
+    creatorId: userId,
   });
 
   return NextResponse.json(plan, { status: 201 });
@@ -44,10 +47,19 @@ export const GET = async function (
 ) {
   await dbConnect();
 
-  if (!params.userId)
+  const { userId } = await params;
+
+  if (!userId)
     return NextResponse.json({ message: "User ID required" }, { status: 400 });
 
-  const plans = await PlanModel.find({ creatorId: params.userId });
+  const user = await getUserById(userId);
+  if (!user)
+    return NextResponse.json(
+      { message: "User ID is invalid" },
+      { status: 404 },
+    );
+
+  const plans = await PlanModel.find({ creatorId: userId }).lean();
 
   return NextResponse.json(plans, { status: 200 });
 };
