@@ -15,12 +15,14 @@ const PlanSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "User",
+      default: [],
     },
   ],
   restaurants: [
     {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",
+      default: [],
     },
   ],
 });
