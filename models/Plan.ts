@@ -7,13 +7,13 @@ const PlanSchema = new Schema({
     required: true,
   },
   creatorId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     ref: "User",
     required: true,
   },
   sharedUsers: [
     {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: "User",
       default: [],
     },
