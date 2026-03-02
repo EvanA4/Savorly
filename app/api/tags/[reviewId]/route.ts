@@ -15,7 +15,8 @@ export const GET = async function (
   })) as TagDocument[];
 
   return NextResponse.json({
+    error: false,
     message: "Successfully got tags",
-    tags,
+    value: tags,
   });
 };

@@ -24,12 +24,6 @@ function DemoNav() {
           Maps API
         </Link>
         <Link
-          href={"/demos/rest-api"}
-          className="hover:bg-neutral-200 flex items-center px-3"
-        >
-          Restaurant API
-        </Link>
-        <Link
           href={"/demos/mongodb"}
           className="hover:bg-neutral-200 flex items-center px-3"
         >

@@ -1,9 +1,12 @@
 "use client";
 
+import { Restaurant } from "@/types/restaurant";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
-function SRMWrap() {
+function SRMWrap(props: {
+  onMarkerClick: (rest: Restaurant) => Promise<void>;
+}) {
   const SRMMap = useMemo(
     () =>
       dynamic(() => import("@/components/modals/SelectRest/SRMMap"), {
@@ -19,7 +22,7 @@ function SRMWrap() {
     [],
   );
 
-  return <SRMMap />;
+  return <SRMMap onMarkerClick={props.onMarkerClick} />;
 }
 
 export default SRMWrap;

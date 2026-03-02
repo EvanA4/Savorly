@@ -4,17 +4,20 @@ import React from "react";
 import Modal from "../../general/Modal";
 // import Image from "next/image";
 import SRMWrap from "./SRMWrap";
+import { Restaurant } from "@/types/restaurant";
+import { useRouter } from "next/navigation";
 
 function SelectRestModal(props: {
   visible: boolean;
   setVisibile: React.Dispatch<React.SetStateAction<boolean>>;
+  onMarkerClick: (rest: Restaurant) => Promise<void>;
 }) {
   return (
     <Modal visible={props.visible} setVisibile={props.setVisibile} centered>
       <div className="bg-neutral-800 w-[95vw] md:w-[80vw] 3xl:w-[50vw] h-[70vh] rounded-3xl relative overflow-hidden shadow-xl">
         {/* Background map component */}
         <div className="h-full">
-          <SRMWrap />
+          <SRMWrap onMarkerClick={props.onMarkerClick} />
         </div>
 
         {/* Corner button */}

@@ -13,8 +13,9 @@ import Image from "next/image";
 import MultiSelectDD from "@/components/general/MultiSelectDD";
 import SingleSelectDD from "@/components/general/SingleSelectDD";
 import { Map } from "leaflet";
+import { poiSearchRests } from "@/utils/client/poi";
 
-function SRMMap() {
+function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
   const [rests, setRests] = useState<Restaurant[]>([]);
   const cuisines = ["All cuisines", ...RESTAURANT_TYPES];
   const restrictions = ["Option 1", "Option 2", "Option 3", "Option 4"];
@@ -26,20 +27,21 @@ function SRMMap() {
   const isMarkerOpen = useRef(false);
   const [map, setMap] = useState<Map | undefined>(undefined);
 
-  async function refreshRests(toSend: {
+  async function refreshRests(toSearch: {
     searchStr: string;
     lat: number;
     lng: number;
     cuisine: string;
     restrictions: string[];
   }) {
-    const rawRes = await fetch("/api/poi", {
-      method: "POST",
-      body: JSON.stringify(toSend),
-    });
-    const res: Restaurant[] = await rawRes.json();
-    // console.log(res);
-    setRests(res);
+    const restaurantRes = await poiSearchRests(toSearch);
+    const rerr = restaurantRes.anticipate();
+
+    if (rerr.error) {
+      console.log(`Failed to fetch restaurants: ${rerr.message}`);
+    }
+
+    setRests(restaurantRes.unwrap());
   }
 
   async function handleSearch() {
@@ -128,7 +130,7 @@ function SRMMap() {
           {rests.map((rest, idx) => (
             <Marker position={[rest.lat, rest.lng]} key={idx}>
               <Popup>
-                <RestMarker rest={rest} />
+                <RestMarker rest={rest} onMarkerClick={props.onMarkerClick} />
               </Popup>
             </Marker>
           ))}

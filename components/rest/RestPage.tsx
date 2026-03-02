@@ -4,16 +4,16 @@ import StickyRestSelect from "../forms/StickyRestSelect";
 import Image from "next/image";
 import ReviewCard from "./ReviewCard";
 import Rating from "./Rating";
-import ReviewModal from "../modals/Review/ReviewModal";
 import { useUser } from "@auth0/nextjs-auth0";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Restaurant } from "@/types/restaurant";
-import { PopulatedReview } from "@/types/review";
+import { getRestaurantById } from "@/utils/client/restaurant";
+import Link from "next/link";
+import { getReviewsByRestaurantId } from "@/utils/client/review";
+import { ReviewDocument } from "@/models/Review";
 
 function RestPage() {
-  const [showReviewModal, setShowReviewModal] = useState(false);
   const { user, isLoading } = useUser();
-  const [review, setReview] = useState<PopulatedReview>();
   const [rest, setRest] = useState<Restaurant>({
     name: "Loading...",
     mapboxId: "",
@@ -22,46 +22,32 @@ function RestPage() {
     lat: -1,
     lng: -1,
   });
+  const [reviews, setReviews] = useState<ReviewDocument[]>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
 
   async function fetchRest() {
-    const rawRes = await fetch(`/api/poi/${searchParams.get("id")}`);
-    const res = await rawRes.json();
+    const restaurantRes = await getRestaurantById(searchParams.get("id")!);
+    const rerr = restaurantRes.anticipate();
 
-    if (!res.restaurant) {
+    if (rerr.error) {
       router.back();
     }
 
-    setRest(res.restaurant);
+    setRest(restaurantRes.unwrap());
   }
 
-  async function checkForReview() {
-    let rawRes = await fetch(
-      `/api/review/${user!.sub}?restaurantId=${searchParams.get("id")}`,
+  async function fetchReviews() {
+    const restaurantRes = await getReviewsByRestaurantId(
+      searchParams.get("id")!,
     );
-    let res = await rawRes.json();
-    let review: PopulatedReview;
-    if (res.reviews && res.reviews.length > 0) {
-      review = res.reviews[0];
+    const rerr = restaurantRes.anticipate();
+
+    if (rerr.error) {
+      console.log(rerr.message);
     } else {
-      return;
+      setReviews(restaurantRes.unwrap());
     }
-
-    rawRes = await fetch(`/api/images?reviewId=${review._id}`);
-    res = await rawRes.json();
-    review.images = res.images;
-
-    rawRes = await fetch(`/api/tags/${review._id}`);
-    res = await rawRes.json();
-    review.tags = res.tags;
-
-    setReview(review);
-  }
-
-  const reviews = [];
-  for (let i = 0; i < 11; ++i) {
-    reviews.push(<ReviewCard rating={i / 2} />);
   }
 
   useEffect(() => {
@@ -70,9 +56,7 @@ function RestPage() {
         router.back();
       }
       fetchRest();
-      if (user) {
-        checkForReview();
-      }
+      fetchReviews();
     }
   }, [searchParams, router, user, isLoading]);
 
@@ -88,12 +72,12 @@ function RestPage() {
           </div>
         </div>
         {user && (
-          <button
+          <Link
             className="px-3 py-2 bg-blue-200 hover:bg-blue-300 rounded-lg"
-            onClick={() => setShowReviewModal((prev) => !prev)}
+            href={`/posts?restaurantId=${searchParams.get("id")!}`}
           >
-            {review ? "Edit Review" : "Review"}
-          </button>
+            Manage Reviews
+          </Link>
         )}
       </div>
 
@@ -135,7 +119,9 @@ function RestPage() {
             Reviews
           </p>
           <div className="flex xl:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
-            {...reviews}
+            {reviews.map((val, idx) => (
+              <ReviewCard review={val} key={idx} />
+            ))}
           </div>
         </div>
 
@@ -143,13 +129,6 @@ function RestPage() {
           <StickyRestSelect />
         </div>
       </div>
-
-      <ReviewModal
-        visible={showReviewModal}
-        setVisibile={setShowReviewModal}
-        review={review}
-        setReview={setReview}
-      />
     </div>
   );
 }

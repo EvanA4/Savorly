@@ -1,8 +1,11 @@
-import { MapBoxResponse } from "@/types/mapbox/lookupResponse";
 import { Restaurant } from "@/types/restaurant";
+import { APIResult } from "@/types/results";
+import { poiSearchRests } from "@/utils/server/poi";
 import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async function (req: NextRequest) {
+export const POST = async function (
+  req: NextRequest,
+): Promise<NextResponse<APIResult<Restaurant[]>>> {
   const body: {
     searchStr: string;
     lat: number;
@@ -10,51 +13,26 @@ export const POST = async function (req: NextRequest) {
     cuisine: string;
     restrictions: string[];
   } = await req.json();
-  body.cuisine =
-    body.cuisine == "All cuisines"
-      ? "restaurant"
-      : body.cuisine.toLowerCase().replaceAll(" ", "_") + "_restaurant";
-  // console.log(body);
 
-  let rawRes: Response;
-  if (body.searchStr) {
-    rawRes = await fetch(
-      "https://api.mapbox.com/search/searchbox/v1/forward?" +
-        new URLSearchParams({
-          q: body.searchStr,
-          limit: "10",
-          proximity: `${body.lng},${body.lat}`,
-          poi_category: body.cuisine,
-          access_token: process.env.MAPBOX_KEY!,
-        }),
-    );
-  } else {
-    rawRes = await fetch(
-      `https://api.mapbox.com/search/searchbox/v1/category/${body.cuisine}?` +
-        new URLSearchParams({
-          access_token: process.env.MAPBOX_KEY!,
-          language: "en",
-          limit: "10",
-          proximity: `${body.lng},${body.lat}`,
-        }),
+  const res = await poiSearchRests(body);
+  const rerr = res.anticipate();
+  if (rerr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: rerr.message,
+        value: undefined,
+      },
+      { status: 200 },
     );
   }
-  const res: MapBoxResponse = await rawRes.json();
-  // console.log(res);
 
-  if (res.features) {
-    const restaurants: Restaurant[] = res.features.map((val) => ({
-      mapboxId: val.properties.mapbox_id,
-      name: val.properties.name,
-      website: val.properties.metadata?.website,
-      phone: val.properties.metadata?.phone,
-      lng: val.geometry.coordinates[0],
-      lat: val.geometry.coordinates[1],
-    }));
-    // console.log(restaurants);
-
-    return NextResponse.json(restaurants, { status: 200 });
-  }
-
-  return NextResponse.json([], { status: 200 });
+  return NextResponse.json(
+    {
+      error: false,
+      message: "Successfully performed POI search for restaurants.",
+      value: res.unwrap(),
+    },
+    { status: 200 },
+  );
 };

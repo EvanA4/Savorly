@@ -1,30 +1,27 @@
-import { getRestaurantById } from "@/utils/handlers/restaurant";
+import { Restaurant } from "@/types/restaurant";
+import { APIResult } from "@/types/results";
+import { getRestaurantById } from "@/utils/server/restaurant";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { poiId: string } },
-) {
+): Promise<NextResponse<APIResult<Restaurant>>> {
   const { poiId } = await params;
-  const restaurant = await getRestaurantById(poiId);
-  if (!restaurant) {
-    return NextResponse.json(
-      {
-        message: "Failed to retrieve restaurant.",
-      },
-      {
-        status: 200,
-      },
-    );
+  const restaurantRes = await getRestaurantById(poiId);
+  const rerr = restaurantRes.anticipate();
+
+  if (rerr.error) {
+    return NextResponse.json({
+      error: true,
+      message: rerr.message,
+      value: undefined,
+    });
   }
 
-  return NextResponse.json(
-    {
-      message: "Successfully retrieved restaurant!",
-      restaurant,
-    },
-    {
-      status: 200,
-    },
-  );
+  return NextResponse.json({
+    error: false,
+    message: "Successfully fetched restaurant by ID.",
+    value: restaurantRes.unwrap(),
+  });
 };

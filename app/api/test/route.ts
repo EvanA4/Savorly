@@ -1,9 +1,30 @@
-import { IMovie, Movie } from "@/models/Movie";
-import dbConnect from "@/utils/dbconnect";
+import { IMovie } from "@/models/Movie";
+import { APIResult, ResultErr } from "@/types/results";
+import { fetch3Movies } from "@/utils/server/movies";
 import { NextResponse } from "next/server";
 
-export const GET = async function () {
-  await dbConnect();
-  const movies = (await Movie.find().limit(3)) as IMovie[];
-  return NextResponse.json(movies, { status: 200 });
+export const GET = async function (): Promise<
+  NextResponse<APIResult<IMovie[]>>
+> {
+  const moviesRes = await fetch3Movies();
+  const rerr: ResultErr = moviesRes.anticipate();
+  if (rerr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Error fetching movies: ${rerr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      error: false,
+      message: `Successfully retrieved movies.`,
+      value: moviesRes.unwrap(),
+    },
+    { status: 200 },
+  );
 };
