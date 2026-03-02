@@ -102,29 +102,9 @@ function ReviewModal(props: {
     }
   }
 
-  // async function handleDelete() {
-  //   const res = await deleteReview(
-  //     props.userId,
-  //     props.review!._id.toString()
-  //   );
-  //   const rerr = res.anticipate();
-  //   if (rerr.error) {
-  //     console.log(rerr.message);
-  //   } else {
-  //     setTitleInput("");
-  //     setDescInput("");
-  //     setRatingInput(0);
-  //     setTags([]);
-  //     setImagesInput([]);
-  //     setPrevImagesInput([]);
-  //     props.setReview(undefined);
-  //     props.setVisible(false);
-  //   }
-  // }
-
   return (
     <Modal visible={props.visible} setVisibile={props.setVisible} centered>
-      <div className="w-[95vw] md:w-[80vw] 3xl:w-[50vw] overflow-scroll bg-white shadow-xl rounded-xl border border-neutral-300 p-5 flex flex-col gap-5">
+      <div className="w-[95vw] md:w-[80vw] 3xl:w-[50vw] max-h-[90vh] overflow-scroll bg-white shadow-xl rounded-xl border border-neutral-300 p-5 flex flex-col gap-5 overflow-x-hidden">
         <p className="text-xl text-center">Create Review</p>
         <input
           className="bg-white shadow-md p-3 w-full rounded-lg border border-neutral-300"
@@ -133,7 +113,7 @@ function ReviewModal(props: {
           value={titleInput}
         />
         <textarea
-          className="bg-white resize-none shadow-md p-3 w-full rounded-lg border border-neutral-300"
+          className="bg-white resize-none shadow-md p-3 w-full rounded-lg border border-neutral-300 min-h-20"
           placeholder="Description"
           onChange={(e) => setDescInput(e.target.value)}
           value={descInput}
@@ -147,7 +127,7 @@ function ReviewModal(props: {
         />
         <TagSelect tags={tags} setTags={setTags} />
 
-        <div className="min-h-[30vh]">
+        <div>
           {props.review && (
             <div className="flex gap-1 mb-1">
               {prevImagesInput.map((val, idx) => (
