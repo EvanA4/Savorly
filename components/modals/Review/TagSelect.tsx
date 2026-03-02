@@ -67,7 +67,7 @@ function TagSelect(props: {
         onChange={(e) => setTagSearch(e.target.value)}
       />
 
-      <div className="absolute bottom-0 left-0 translate-y-[100%] max-h-[25vh] rounded-b-lg overflow-scroll w-full z-500 divide-solid divide-y divide-gray-200 shadow-md">
+      <div className="absolute bottom-0 left-0 translate-y-full max-h-[25vh] rounded-b-lg overflow-y-scroll w-full z-500 divide-solid divide-y divide-gray-200 shadow-md">
         {suggestions.map((val, idx) => (
           <button
             key={idx}

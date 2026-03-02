@@ -3,13 +3,18 @@ import { Restaurant } from "@/types/restaurant";
 import Image from "next/image";
 import React from "react";
 
-function RestMarker(props: { rest: Restaurant }) {
+function RestMarker(props: {
+  rest: Restaurant;
+  onMarkerClick: (rest: Restaurant) => Promise<void>;
+}) {
   const { rest } = props;
   return (
     <div className="w-[200px] pb-3">
-      <a href={`/restaurant?id=${rest.mapboxId}`}>
-        <span className="text-xl m-0 p-0 block text-black">{rest.name}</span>
-      </a>
+      <button onClick={() => props.onMarkerClick(rest)}>
+        <span className="text-xl m-0 p-0 block text-black text-start cursor-pointer">
+          {rest.name}
+        </span>
+      </button>
       {rest.phone && (
         <div className="flex gap-5 items-center mt-3 opacity-60">
           <Image src="/svgs/phone.svg" width={20} height={20} alt="phone" />

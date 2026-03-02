@@ -1,4 +1,4 @@
-import { getUserById } from "@/utils/handlers/users";
+import { getUserById } from "@/utils/server/users";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async function (

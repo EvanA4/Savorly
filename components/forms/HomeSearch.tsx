@@ -2,13 +2,20 @@
 
 import React, { useState } from "react";
 import SelectRestModal from "../modals/SelectRest/SelectRestModal";
+import { Restaurant } from "@/types/restaurant";
+import { useRouter } from "next/navigation";
 
 function HomeSearch() {
   const [searchStr, setSearchStr] = useState("");
   const [showSelectRest, setShowSelectRest] = useState(false);
+  const router = useRouter();
 
   async function handleSearch() {
     console.log(`Searched string: "${searchStr}"`);
+  }
+
+  async function handleMarkerClick(rest: Restaurant) {
+    router.push(`/restaurant?id=${rest.mapboxId}`);
   }
 
   return (
@@ -39,6 +46,7 @@ function HomeSearch() {
       <SelectRestModal
         visible={showSelectRest}
         setVisibile={setShowSelectRest}
+        onMarkerClick={handleMarkerClick}
       />
     </div>
   );

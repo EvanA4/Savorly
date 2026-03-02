@@ -11,6 +11,17 @@ const nextConfig: NextConfig = {
         hostname: "**",
       },
     ],
+    localPatterns: [
+      {
+        pathname: "/api/images",
+      },
+      {
+        pathname: "/svgs/*",
+      },
+      {
+        pathname: "/*",
+      },
+    ],
   },
 };
 

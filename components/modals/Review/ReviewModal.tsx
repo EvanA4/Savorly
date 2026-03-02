@@ -3,19 +3,20 @@ import React, { useEffect, useState } from "react";
 import Modal from "../../general/Modal";
 import FileUploader from "../../forms/FileUploader";
 import TagSelect from "./TagSelect";
-import { useSearchParams } from "next/navigation";
-import { useUser } from "@auth0/nextjs-auth0";
 import { PopulatedReview } from "@/types/review";
 import Image from "next/image";
+import { createReview, updateReview } from "@/utils/client/review";
+import { ReviewDocument } from "@/models/Review";
 
 function ReviewModal(props: {
   visible: boolean;
-  setVisibile: React.Dispatch<React.SetStateAction<boolean>>;
+  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
   review?: PopulatedReview;
   setReview: React.Dispatch<React.SetStateAction<PopulatedReview | undefined>>;
+  setReviews: React.Dispatch<React.SetStateAction<ReviewDocument[]>>;
+  restaurantId: string;
+  userId: string;
 }) {
-  const { user } = useUser();
-  const searchParams = useSearchParams();
   const [tags, setTags] = useState<string[]>([]);
   const [titleInput, setTitleInput] = useState<string>("");
   const [descInput, setDescInput] = useState<string>("");
@@ -25,6 +26,7 @@ function ReviewModal(props: {
 
   useEffect(() => {
     if (props.review) {
+      setTitleInput(props.review.title);
       setTags(props.review.tags.map((val) => val.label as unknown as string));
       setDescInput(props.review.description);
       setRatingInput(props.review.rating);
@@ -33,75 +35,76 @@ function ReviewModal(props: {
   }, [props.review]);
 
   async function handleSubmit() {
-    const restaurantId = searchParams.get("id");
-    if (user && restaurantId) {
-      // perform submission here
-      const formData = new FormData();
-      for (const idx in imagesInput) {
-        formData.append("images", imagesInput[idx]);
-      }
-      formData.append("description", descInput);
-      formData.append("title", titleInput);
-      formData.append("rating", ratingInput.toString());
-      for (const idx in tags) {
-        formData.append("tags", tags[idx]);
-      }
-      formData.append("restaurantId", restaurantId);
+    const src = {
+      restaurantId: props.restaurantId,
+      title: titleInput,
+      description: descInput,
+      rating: ratingInput,
+      tags: tags,
+      imagesToCreate: imagesInput,
+    };
 
+    let rev: PopulatedReview; // temporary review object
+    if (props.userId && props.restaurantId) {
       if (!props.review) {
-        const rawRes = await fetch(`/api/review/${user.sub}`, {
-          method: "POST",
-          body: formData,
-        });
-        const res = await rawRes.json();
-        props.setReview(res.review);
+        const res = await createReview(props.userId, src);
+        const rerr = res.anticipate();
+        if (rerr.error) {
+          console.log(rerr.message);
+        } else {
+          rev = res.unwrap();
+          props.setReview(res.unwrap());
+          props.setReviews((prev) => [
+            ...prev,
+            {
+              _id: rev._id,
+              restaurantId: props.restaurantId,
+              title: titleInput,
+              description: descInput,
+              rating: ratingInput,
+            } as ReviewDocument,
+          ]);
+        }
       } else {
-        const imagesToDelete = props.review.images.filter(
-          (val, idx) => !prevImagesInput[idx],
-        );
-        imagesToDelete.forEach((val) =>
-          formData.append("prevImagesToDelete", val._id!.toString()),
-        );
-        const rawRes = await fetch(
-          `/api/review/${user.sub}/${props.review._id}`,
-          {
-            method: "PUT",
-            body: formData,
-          },
-        );
-        const res = await rawRes.json();
-        setPrevImagesInput(Array(res.review.images.length).fill(true));
-        setImagesInput([]);
-        props.setReview(res.review);
+        const res = await updateReview({
+          _id: props.review._id.toString(),
+          ...src,
+          imagesToDelete: props.review.images.filter(
+            (_, idx) => !prevImagesInput[idx],
+          ),
+        });
+        const rerr = res.anticipate();
+        if (rerr.error) {
+          console.log(rerr.message);
+        } else {
+          rev = res.unwrap();
+          setPrevImagesInput(Array(rev.images.length).fill(true));
+          setImagesInput([]);
+          props.setReview(rev);
+
+          props.setReviews((prev) =>
+            prev.map((val) =>
+              val._id.toString() !== rev._id.toString()
+                ? val
+                : ({
+                    _id: rev._id,
+                    restaurantId: props.restaurantId,
+                    title: titleInput,
+                    description: descInput,
+                    rating: ratingInput,
+                  } as ReviewDocument),
+            ),
+          );
+        }
       }
 
-      props.setVisibile(false);
+      props.setVisible(false);
     }
   }
 
-  async function handleDelete() {
-    const rawRes = await fetch(
-      `/api/review/${user!.sub}/${props.review!._id}`,
-      {
-        method: "DELETE",
-      },
-    );
-    const res = await rawRes.json();
-    console.log(res);
-
-    setTags([]);
-    setTitleInput("");
-    setDescInput("");
-    setRatingInput(0);
-    setImagesInput([]);
-    setPrevImagesInput([]);
-    props.setReview(undefined);
-    props.setVisibile(false);
-  }
-
   return (
-    <Modal visible={props.visible} setVisibile={props.setVisibile} centered>
-      <div className="w-[95vw] md:w-[80vw] 3xl:w-[50vw] overflow-scroll bg-white shadow-xl rounded-xl border border-neutral-300 p-5 flex flex-col gap-5">
+    <Modal visible={props.visible} setVisibile={props.setVisible} centered>
+      <div className="w-[95vw] md:w-[80vw] 3xl:w-[50vw] max-h-[90vh] overflow-scroll bg-white shadow-xl rounded-xl border border-neutral-300 p-5 flex flex-col gap-5 overflow-x-hidden">
         <p className="text-xl text-center">Create Review</p>
         <input
           className="bg-white shadow-md p-3 w-full rounded-lg border border-neutral-300"
@@ -110,7 +113,7 @@ function ReviewModal(props: {
           value={titleInput}
         />
         <textarea
-          className="bg-white resize-none shadow-md p-3 w-full rounded-lg border border-neutral-300"
+          className="bg-white resize-none shadow-md p-3 w-full rounded-lg border border-neutral-300 min-h-20"
           placeholder="Description"
           onChange={(e) => setDescInput(e.target.value)}
           value={descInput}
@@ -124,7 +127,7 @@ function ReviewModal(props: {
         />
         <TagSelect tags={tags} setTags={setTags} />
 
-        <div className="min-h-[30vh]">
+        <div>
           {props.review && (
             <div className="flex gap-1 mb-1">
               {prevImagesInput.map((val, idx) => (
@@ -165,23 +168,12 @@ function ReviewModal(props: {
         </div>
 
         <div className="flex justify-end">
-          <div className="flex gap-3">
-            {props.review && (
-              <button
-                className="px-3 py-2 bg-red-200 hover:bg-red-300 rounded-lg"
-                onClick={() => handleDelete()}
-              >
-                Delete
-              </button>
-            )}
-
-            <button
-              className="px-3 py-2 bg-blue-200 hover:bg-blue-300 rounded-lg"
-              onClick={() => handleSubmit()}
-            >
-              {props.review ? "Update" : "Submit"}
-            </button>
-          </div>
+          <button
+            className="px-3 py-2 bg-blue-200 hover:bg-blue-300 rounded-lg"
+            onClick={() => handleSubmit()}
+          >
+            {props.review ? "Update" : "Submit"}
+          </button>
         </div>
       </div>
     </Modal>

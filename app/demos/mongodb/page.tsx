@@ -2,15 +2,19 @@
 
 import DemoNav from "@/components/general/DemoNav";
 import { IMovie } from "@/models/Movie";
+import { fetch3Movies } from "@/utils/client/movies";
 import React, { useEffect, useState } from "react";
 
 function MongoPage() {
   const [movies, setMovies] = useState<IMovie[]>([]);
 
   async function fetchMovies() {
-    const rawRes = await fetch("/api/test");
-    const res = (await rawRes.json()) as IMovie[];
-    setMovies(res);
+    const res = await fetch3Movies();
+    const rerr = res.anticipate();
+    if (rerr.error) {
+      console.log(`Failed to fetch movies: ${rerr.message}`);
+    }
+    setMovies(res.unwrap());
   }
 
   useEffect(() => {

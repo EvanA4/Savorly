@@ -1,13 +1,14 @@
 import HomeSearch from "@/components/forms/HomeSearch";
 import StickyRestSelect from "@/components/forms/StickyRestSelect";
 import Nav from "@/components/general/Nav";
-import RestCard from "@/components/rest/RestCard";
+import AllReviews from "@/components/rest/AllReviews";
+// import RestCard from "@/components/rest/RestCard";
 
 export default function Home() {
-  const rests = [];
-  for (let i = 0; i < 11; ++i) {
-    rests.push(<RestCard rating={i / 2} />);
-  }
+  // const rests = [];
+  // for (let i = 0; i < 11; ++i) {
+  //   rests.push(<RestCard rating={i / 2} />);
+  // }
 
   return (
     <div className="min-h-full relative flex flex-col gap-5 md:gap-10">
@@ -21,7 +22,8 @@ export default function Home() {
             Popular Restaurants
           </p>
           <div className="flex xl:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
-            {...rests}
+            {/* {...rests} */}
+            <AllReviews />
           </div>
         </div>
 
