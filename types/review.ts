@@ -8,6 +8,7 @@ export type Review = {
   rating: number;
   description: string;
   title: string;
+  budget: number;
 };
 
 export type PopulatedReview = {
@@ -16,6 +17,7 @@ export type PopulatedReview = {
   rating: number;
   description: string;
   title: string;
+  budget: number;
   images: IImage[];
   tags: TagDocument[];
 } & Document;

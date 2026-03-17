@@ -1,3 +1,5 @@
+// don't know if i actually need this...?
+
 import { IImage } from "./imagedb/image";
 
 export type BudgetLevel = "low" | "medium" | "high";

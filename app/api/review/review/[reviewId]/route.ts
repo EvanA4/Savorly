@@ -91,6 +91,39 @@ export const PUT = async function (
 
   // tags are optional
 
+  // budget must be int within [1,3]
+  const budgetArr = in_fd.getAll("budget");
+  if (budgetArr.length == 0 || !budgetArr[0]) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Budget is required",
+      },
+      { status: 400 },
+    );
+  }
+  let budget: number;
+  try {
+    budget = parseInt(budgetArr[0] as string);
+    if (budget < 1 || budget > 3 || !Number.isInteger(budget)) {
+      return NextResponse.json(
+        {
+          error: true,
+          message: "Budget must be an int within [1,3]",
+        },
+        { status: 400 },
+      );
+    }
+  } catch {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Budget must be an int within [1,3]",
+      },
+      { status: 400 },
+    );
+  }
+
   // restaurantId must be valid
   const restIdArr = in_fd.getAll("restaurantId");
   if (restIdArr.length == 0 || !restIdArr[0]) {
@@ -120,6 +153,7 @@ export const PUT = async function (
     title: titleArr[0] as string,
     description: descArr[0] as string,
     rating: rating,
+    budget: budget,
     restaurantId: restIdArr[0] as string,
     tags: in_fd.getAll("tags") as string[],
     imagesToCreate: in_fd.getAll("images") as File[],
