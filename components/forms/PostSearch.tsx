@@ -1,17 +1,58 @@
 "use client";
 
+import { ReviewDocument } from "@/models/Review";
+import {
+  getReviewsBySearchStr,
+  getReviewsByUserId,
+} from "@/utils/client/review";
+import { User } from "@auth0/nextjs-auth0/types";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import React, { useState } from "react";
-import SelectRestModal from "../modals/SelectRest/SelectRestModal";
 
-function PostSearch() {
+function PostSearch(props: {
+  setReviews: React.Dispatch<React.SetStateAction<ReviewDocument[]>>;
+  user: User | null | undefined;
+  searchParams: ReadonlyURLSearchParams;
+}) {
   const [searchStr, setSearchStr] = useState("");
 
+  async function refreshPosts() {
+    const spget = props.searchParams.get("restaurantId");
+    const res = await getReviewsByUserId(
+      props.user!.sub,
+      spget ? spget! : undefined,
+    );
+    const rerr = res.anticipate();
+    if (rerr.error) {
+      console.log(rerr.message);
+    } else {
+      const tmpPosts = res.unwrap();
+      props.setReviews(tmpPosts);
+    }
+  }
+
   async function handleSearch() {
-    console.log(`Searched string: "${searchStr}"`);
+    if (props.user) {
+      if (!searchStr) refreshPosts();
+      else {
+        const spget = props.searchParams.get("restaurantId");
+        const reviewsRes = await getReviewsBySearchStr(
+          searchStr,
+          spget ? spget : undefined,
+          props.user.sub,
+        );
+        const rerr = reviewsRes.anticipate();
+        if (rerr.error) {
+          console.log(`Error: failed to get reviews: ${rerr.message}`);
+        } else {
+          props.setReviews(reviewsRes.unwrap());
+        }
+      }
+    }
   }
 
   return (
-    <div className="bg-[#f2f2f2] px-10 pt-[60px] border-b-2 border-b-neutral-200 pb-5">
+    <div className="bg-[#f2f2f2] px-10 pt-15 border-b-2 border-b-neutral-200 pb-5">
       <p className="pt-5 text-2xl">Find posts or restaurants.</p>
       <div className="flex w-full rounded-xl overflow-hidden mt-2">
         <input

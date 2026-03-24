@@ -21,16 +21,31 @@ export async function poiSearchRests(toSearch: {
 
     let rawRes: Response;
     if (toSearch.searchStr) {
-      rawRes = await fetch(
-        "https://api.mapbox.com/search/searchbox/v1/forward?" +
-          new URLSearchParams({
-            q: toSearch.searchStr,
-            limit: "10",
-            proximity: `${toSearch.lng},${toSearch.lat}`,
-            poi_category: toSearch.cuisine,
-            access_token: process.env.MAPBOX_KEY!,
-          }),
-      );
+      // if only a query lookup
+      if (!toSearch.cuisine) {
+        rawRes = await fetch(
+          "https://api.mapbox.com/search/searchbox/v1/forward?" +
+            new URLSearchParams({
+              q: toSearch.searchStr,
+              limit: "10",
+              access_token: process.env.MAPBOX_KEY!,
+            }),
+        );
+      }
+
+      // if more values provided
+      else {
+        rawRes = await fetch(
+          "https://api.mapbox.com/search/searchbox/v1/forward?" +
+            new URLSearchParams({
+              q: toSearch.searchStr,
+              limit: "10",
+              proximity: `${toSearch.lng},${toSearch.lat}`,
+              poi_category: toSearch.cuisine,
+              access_token: process.env.MAPBOX_KEY!,
+            }),
+        );
+      }
     } else {
       rawRes = await fetch(
         `https://api.mapbox.com/search/searchbox/v1/category/${toSearch.cuisine}?` +

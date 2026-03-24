@@ -6,6 +6,7 @@ import TagModel, { TagDocument } from "@/models/Tag";
 import { IImage } from "@/types/imagedb/image";
 import { PopulatedReview } from "@/types/review";
 import { EDietRestriction } from "@/types/tag";
+import { poiSearchRests } from "./poi";
 
 export async function getReviewsByUserId(
   userId: string,
@@ -367,4 +368,73 @@ export async function createReview(
       images,
     } as PopulatedReview,
   });
+}
+
+export async function getReviewsBySearchStr(
+  search: string,
+  restaurantId: string | undefined,
+  userId: string | undefined,
+): Promise<Result<ReviewDocument[]>> {
+  try {
+    const reviews: ReviewDocument[] = [];
+    const reviewsSet = new Set<string>();
+    const addReviews = (val: ReviewDocument) => {
+      if (!reviewsSet.has(val._id.toString())) {
+        reviews.push(val);
+        reviewsSet.add(val._id.toString());
+      }
+    };
+
+    // get all restaurants associated with search
+    if (!restaurantId) {
+      const restsRes = await poiSearchRests({
+        searchStr: search,
+        lat: -1,
+        lng: -1,
+        cuisine: "",
+        restrictions: [],
+      });
+      let rerr = restsRes.anticipate();
+      if (!rerr.error) {
+        const rests = restsRes.unwrap();
+
+        // for each found restaurant, find reviews and add them to list
+        for (let i = 0; i < rests.length; ++i) {
+          const reviewsRes = await getReviewsByRestaurantId(rests[i].mapboxId);
+          rerr = reviewsRes.anticipate();
+          if (!rerr.error) {
+            reviewsRes.unwrap().forEach(addReviews);
+          }
+        }
+      }
+    }
+
+    // for each review, check whether description or title contains search string
+    let constraints = {};
+    if (restaurantId && userId) constraints = { restaurantId, userId };
+    else if (restaurantId) constraints = { restaurantId };
+    else constraints = { userId };
+    const descReviews = await ReviewModel.find({
+      description: new RegExp(".*" + search + ".*", "i"),
+      ...constraints,
+    });
+    descReviews.forEach(addReviews);
+    const titleReviews = await ReviewModel.find({
+      title: new RegExp(".*" + search + ".*", "i"),
+      ...constraints,
+    });
+    titleReviews.forEach(addReviews);
+
+    return new Result({
+      error: false,
+      message: "Successfully searched for reviews",
+      value: reviews,
+    });
+  } catch (e) {
+    const err = e as { message?: string };
+    return new Result({
+      error: true,
+      message: err.message ? err.message : "Failed to create review.",
+    });
+  }
 }

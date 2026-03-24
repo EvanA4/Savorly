@@ -149,3 +149,16 @@ export async function deleteReview(
   const apiRes = (await rawRes.json()) as APIResult<ReviewDocument>;
   return new Result<ReviewDocument>(apiRes);
 }
+
+export async function getReviewsBySearchStr(
+  search: string,
+  restaurantId: string | undefined,
+  userId: string | undefined,
+): Promise<Result<ReviewDocument[]>> {
+  let url = `/api/review/search?q=${search}`;
+  if (restaurantId) url += `&rid=${restaurantId}`;
+  if (userId) url += `&uid=${userId}`;
+  const rawRes = await fetch(url);
+  const apiRes = (await rawRes.json()) as APIResult<ReviewDocument[]>;
+  return new Result<ReviewDocument[]>(apiRes);
+}

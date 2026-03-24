@@ -30,7 +30,11 @@ function PostsPage() {
   return (
     <>
       {/* User's search parameters */}
-      <PostSearch />
+      <PostSearch
+        setReviews={setReviews}
+        user={user}
+        searchParams={searchParams}
+      />
 
       {/* Scrollable Section (User's Info and Posts Display) */}
       <div className="flex-1 overflow-y-auto bg-[#f2f2f2]">

@@ -1,17 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import SelectRestModal from "../modals/SelectRest/SelectRestModal";
 import { Restaurant } from "@/types/restaurant";
 import { useRouter } from "next/navigation";
+import { ReviewDocument } from "@/models/Review";
+import { getReviewsBySearchStr } from "@/utils/client/review";
+import { APIResult } from "@/types/results";
 
-function HomeSearch() {
+function HomeSearch(props: {
+  setReviews: Dispatch<SetStateAction<ReviewDocument[]>>;
+}) {
   const [searchStr, setSearchStr] = useState("");
   const [showSelectRest, setShowSelectRest] = useState(false);
   const router = useRouter();
 
   async function handleSearch() {
-    console.log(`Searched string: "${searchStr}"`);
+    if (!searchStr) {
+      const rawRes = await fetch("/api/review");
+      const apiRes = (await rawRes.json()) as APIResult<ReviewDocument[]>;
+      if (apiRes.value) {
+        props.setReviews(apiRes.value);
+      }
+    } else {
+      const reviewsRes = await getReviewsBySearchStr(
+        searchStr,
+        undefined,
+        undefined,
+      );
+      const rerr = reviewsRes.anticipate();
+      if (rerr.error) {
+        console.log(`Error: failed to get reviews: ${rerr.message}`);
+      } else {
+        props.setReviews(reviewsRes.unwrap());
+      }
+    }
   }
 
   async function handleMarkerClick(rest: Restaurant) {

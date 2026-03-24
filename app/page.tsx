@@ -1,19 +1,19 @@
+"use client";
+
 import HomeSearch from "@/components/forms/HomeSearch";
 import StickyRestSelect from "@/components/forms/StickyRestSelect";
 import Nav from "@/components/general/Nav";
-import AllReviews from "@/components/rest/AllReviews";
-// import RestCard from "@/components/rest/RestCard";
+import LandingReviews from "@/components/rest/LandingReviews";
+import { ReviewDocument } from "@/models/Review";
+import { useState } from "react";
 
 export default function Home() {
-  // const rests = [];
-  // for (let i = 0; i < 11; ++i) {
-  //   rests.push(<RestCard rating={i / 2} />);
-  // }
+  const [reviews, setReviews] = useState<ReviewDocument[]>([]);
 
   return (
     <div className="min-h-full relative flex flex-col gap-5 md:gap-10">
       {/* User's search parameters */}
-      <HomeSearch />
+      <HomeSearch setReviews={setReviews} />
 
       {/* Restaurants display */}
       <div className="xl:grid grid-cols-3 2xl:grid-cols-7 pb-15">
@@ -23,7 +23,7 @@ export default function Home() {
           </p>
           <div className="flex xl:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
             {/* {...rests} */}
-            <AllReviews />
+            <LandingReviews reviews={reviews} setReviews={setReviews} />
           </div>
         </div>
 

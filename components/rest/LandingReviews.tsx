@@ -1,23 +1,24 @@
 "use client";
 import { ReviewDocument } from "@/models/Review";
 import ReviewCard from "./ReviewCard";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { APIResult } from "@/types/results";
 
-function AllReviews() {
-  const [reviews, setReviews] = useState<ReviewDocument[]>([]);
-
+function LandingReviews(props: {
+  reviews: ReviewDocument[];
+  setReviews: Dispatch<SetStateAction<ReviewDocument[]>>;
+}) {
   useEffect(() => {
     (async () => {
       const rawRes = await fetch("/api/review");
       const apiRes = (await rawRes.json()) as APIResult<ReviewDocument[]>;
       if (apiRes.value) {
-        setReviews(apiRes.value);
+        props.setReviews(apiRes.value);
       }
     })();
   }, []);
 
-  return reviews.map((val, idx) => <ReviewCard review={val} key={idx} />);
+  return props.reviews.map((val, idx) => <ReviewCard review={val} key={idx} />);
 }
 
-export default AllReviews;
+export default LandingReviews;
