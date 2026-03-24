@@ -8,10 +8,14 @@ function RestMarker(props: {
   onMarkerClick: (rest: Restaurant) => Promise<void>;
 }) {
   const { rest } = props;
+  const displayURL = rest.website ? new URL(rest.website).hostname : "";
   return (
-    <div className="w-[200px] pb-3">
-      <button onClick={() => props.onMarkerClick(rest)}>
-        <span className="text-xl m-0 p-0 block text-black text-start cursor-pointer">
+    <div className="w-50 pb-3">
+      <button
+        onClick={() => props.onMarkerClick(rest)}
+        className="cursor-pointer"
+      >
+        <span className="text-xl m-0 p-0 block text-black text-start">
           {rest.name}
         </span>
       </button>
@@ -25,8 +29,10 @@ function RestMarker(props: {
         <a href={rest.website}>
           <div className="flex gap-5 items-center mt-3 opacity-60">
             <Image src="/svgs/globe.svg" width={20} height={20} alt="web" />
-            <span className="text-black hover:underline w-fit">
-              {new URL(rest.website).hostname}
+            <span className="text-black hover:underline w-fit text-ellipsis">
+              {displayURL.length > 20
+                ? displayURL.substring(0, 20) + "..."
+                : displayURL}
             </span>
           </div>
         </a>

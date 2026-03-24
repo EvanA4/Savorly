@@ -1,7 +1,7 @@
 "use client";
 
 import { Restaurant, RESTAURANT_TYPES } from "@/types/restaurant";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
@@ -24,8 +24,15 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
   );
   const [selCuisine, setSelCuisine] = useState<number>(0);
   const [searchStr, setSearchStr] = useState<string>("");
-  const isMarkerOpen = useRef(false);
+  const [isMarkerOpen, setIsMarkerOpen] = useState<boolean>(false);
   const [map, setMap] = useState<Map | undefined>(undefined);
+  const [showTips, setShowTips] = useState(true);
+
+  function getTipMsg() {
+    if (rests.length == 0) return "Click the map or use the search bar!";
+    else if (!isMarkerOpen) return "Click on marker to view the restaurant!";
+    else return "Click the restaurant name to visit its page!";
+  }
 
   async function refreshRests(toSearch: {
     searchStr: string;
@@ -62,7 +69,7 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
   }
 
   async function handleClick(mouseLat: number, mouseLng: number) {
-    if (!isMarkerOpen.current) {
+    if (!isMarkerOpen) {
       const toSend = {
         searchStr: "",
         lat: mouseLat,
@@ -77,18 +84,18 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
   }
 
   async function handlePopupOpen() {
-    isMarkerOpen.current = true;
+    setIsMarkerOpen(true);
   }
   async function handlePopupClose() {
     // time before user can click for restaurants after closing marker
     await sleep(500);
-    isMarkerOpen.current = false;
+    setIsMarkerOpen(false);
   }
 
   return (
-    <div className="h-full">
-      <div className="py-4 px-4 bg-neutral-200 flex justify-between h-[30%]">
-        <div className="flex w-[60%] rounded-lg overflow-hidden shadow-md h-fit">
+    <div className="h-full relative">
+      <div className="py-4 px-4 flex justify-between h-[30%] absolute top-0 left-0 w-full">
+        <div className="flex w-[60%] rounded-lg overflow-hidden shadow-md h-fit z-401">
           <input
             type="text"
             className="bg-white shadow-md outline-none px-3 py-2 w-full"
@@ -116,11 +123,13 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
           />
         </div>
       </div>
-      <div className="h-[70%]">
+
+      <div className="h-full">
         <MapContainer
           center={[35.95077372972164, -83.93390908189826]}
           zoom={14}
           scrollWheelZoom={true}
+          zoomControl={false}
           className="h-full"
         >
           <TileLayer
@@ -142,6 +151,27 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
           />
         </MapContainer>
       </div>
+
+      {showTips && (
+        <div className="absolute bottom-0 left-0 w-full z-400 flex justify-center pb-3 opacity-80">
+          <div className="w-[90%] bg-neutral-100 px-3 py-2 rounded-lg grid grid-cols-10 shadow-lg">
+            <div className="col-span-9">{getTipMsg()}</div>
+
+            <button
+              className="flex justify-center items-center"
+              onClick={() => setShowTips(false)}
+            >
+              <Image
+                src="/svgs/close.svg"
+                width={16}
+                height={16}
+                alt="close"
+                className="opacity-50 hover:opacity-70 cursor-pointer"
+              />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
