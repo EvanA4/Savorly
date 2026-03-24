@@ -12,6 +12,10 @@ const PlanRestaurantSchema = new Schema({
     ref: "Restaurant",
     required: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export type PlanRestaurantDocument = PlanRestaurant & Document;
