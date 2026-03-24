@@ -13,6 +13,7 @@ THINGS TO VERIFY:
 images
 description
 rating
+budget
 tags
 userId
 restaurantId
@@ -98,6 +99,39 @@ export const POST = async function (
   }
 
   // tags are optional
+
+  // budget must be an int within [1,3]
+  const budgetArr = in_fd.getAll("budget");
+  if (budgetArr.length == 0 || !budgetArr[0]) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Budget is required",
+      },
+      { status: 400 },
+    );
+  }
+  let budget: number;
+  try {
+    budget = parseInt(budgetArr[0] as string);
+    if (budget < 1 || budget > 3 || !Number.isInteger(budget)) {
+      return NextResponse.json(
+        {
+          error: true,
+          message: "Budget must be an int within [1,3]",
+        },
+        { status: 400 },
+      );
+    }
+  } catch {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Budget must be an int within [1,3]",
+      },
+      { status: 400 },
+    );
+  }
 
   // userId must be valid
   const isUser = (await getUserById(userId)) != undefined;

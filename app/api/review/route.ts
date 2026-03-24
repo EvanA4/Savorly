@@ -1,5 +1,3 @@
-// TEMPORARY PLEASE FOR THE LOVE OF GOD DELETE THIS
-
 import ReviewModel, { ReviewDocument } from "@/models/Review";
 import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
