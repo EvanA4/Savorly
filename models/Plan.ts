@@ -11,20 +11,6 @@ const PlanSchema = new Schema({
     ref: "User",
     required: true,
   },
-  sharedUsers: [
-    {
-      type: String,
-      ref: "User",
-      default: [],
-    },
-  ],
-  restaurants: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Restaurant",
-      default: [],
-    },
-  ],
 });
 
 export type PlanDocument = Plan & Document;
