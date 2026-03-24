@@ -1,5 +1,5 @@
 import PlanModel from "@/models/Plan";
-import { getUserById } from "@/utils/handlers/users";
+import { getUserById } from "@/utils/server/users";
 
 import dbConnect from "@/utils/dbconnect";
 import { NextRequest, NextResponse } from "next/server";
