@@ -6,7 +6,6 @@ import { getImagesByReviewId } from "@/utils/client/image";
 import Rating from "./Rating";
 import { MAPIUser } from "@/types/auth0/mapi_user";
 import { getUserById } from "@/utils/client/users";
-import Link from "next/link";
 
 function ReviewCard(props: { review: ReviewDocument }) {
   const [imageSrc, setImageSrc] = useState("");
@@ -58,9 +57,7 @@ function ReviewCard(props: { review: ReviewDocument }) {
         </div>
       )}
       <div className="w-full h-62.5 bg-white bottom-0 left-0 text-neutral-600 p-5 flex flex-col gap-3">
-        <Link href={`/restaurant?id=${props.review.restaurantId}`}>
-          <b className="text-black">{props.review.title}</b>
-        </Link>
+        <b className="text-black">{props.review.title}</b>
         <div className="flex items-center gap-3">
           <Rating value={props.review.rating} />
         </div>

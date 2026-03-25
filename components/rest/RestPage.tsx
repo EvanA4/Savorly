@@ -9,8 +9,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Restaurant } from "@/types/restaurant";
 import { getRestaurantById } from "@/utils/client/restaurant";
 import Link from "next/link";
-import { getReviewsByRestaurantId } from "@/utils/client/review";
+import {
+  getPopulatedReview,
+  getReviewsByRestaurantId,
+} from "@/utils/client/review";
 import { ReviewDocument } from "@/models/Review";
+import { PopulatedReview } from "@/types/review";
+import ReadReviewModal from "../modals/Review/ReadReviewModal";
 
 function RestPage() {
   const { user, isLoading } = useUser();
@@ -25,6 +30,10 @@ function RestPage() {
   const [reviews, setReviews] = useState<ReviewDocument[]>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [selReview, setSelReview] = useState<PopulatedReview | undefined>(
+    undefined,
+  );
+  const [showRRM, setShowRRM] = useState<boolean>(false);
 
   async function fetchRest() {
     const restaurantRes = await getRestaurantById(searchParams.get("id")!);
@@ -120,7 +129,24 @@ function RestPage() {
           </p>
           <div className="flex xl:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
             {reviews.map((val, idx) => (
-              <ReviewCard review={val} key={idx} />
+              <button
+                key={idx}
+                className="cursor-pointer text-start"
+                onClick={async () => {
+                  const prRes = await getPopulatedReview(val._id.toString());
+                  const rerr = prRes.anticipate();
+                  if (rerr.error) {
+                    console.log(
+                      `Error: failed to open review: ${rerr.message}`,
+                    );
+                  } else {
+                    setSelReview(prRes.unwrap());
+                    setShowRRM(true);
+                  }
+                }}
+              >
+                <ReviewCard review={val} key={idx} />
+              </button>
             ))}
           </div>
         </div>
@@ -129,6 +155,14 @@ function RestPage() {
           <StickyRestSelect />
         </div>
       </div>
+
+      {selReview && (
+        <ReadReviewModal
+          visible={showRRM}
+          setVisible={setShowRRM}
+          review={selReview}
+        />
+      )}
     </div>
   );
 }
