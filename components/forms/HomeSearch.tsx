@@ -60,7 +60,7 @@ function HomeSearch(props: {
       </div>
 
       <button
-        className="bg-red-700 hover:bg-red-600 px-3 py-2 rounded-xl cursor-pointer text-white block xl:hidden mt-5"
+        className="bg-blue-300 hover:bg-blue-200 px-3 py-2 rounded-xl cursor-pointer text-white block xl:hidden mt-5"
         onClick={() => setShowSelectRest((prev) => !prev)}
       >
         Select Restaurant

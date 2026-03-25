@@ -5,7 +5,7 @@ import React from "react";
 function BottomNav() {
   return (
     <div className="w-full fixed bottom-0 left-0 md:hidden">
-      <div className="h-[60px] bg-[#f2f2f2] flex justify-center items-center border-b-2 border-b-neutral-200 z-10 px-3">
+      <div className="h-[60px] bg-[#f2f2f2] flex justify-center items-center border-t-2 border-t-neutral-200 z-10 px-3">
         <div className="flex md:px-10 h-full">
           <Link
             href={"/"}

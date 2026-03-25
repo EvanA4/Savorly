@@ -18,10 +18,10 @@ export default function Home() {
       {/* Restaurants display */}
       <div className="xl:grid grid-cols-3 2xl:grid-cols-7 pb-15">
         <div className="col-span-2 2xl:col-span-5">
-          <p className="pl-15 mb-3 md:mb-5 text-2xl md:text-3xl">
-            Popular Restaurants
+          <p className="pl-10 mb-3 md:mb-5 text-2xl md:text-3xl">
+            Latest Reviews
           </p>
-          <div className="flex xl:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
+          <div className="flex flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
             {/* {...rests} */}
             <LandingReviews reviews={reviews} setReviews={setReviews} />
           </div>

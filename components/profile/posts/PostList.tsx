@@ -97,8 +97,8 @@ function PostList(props: {
     }
   }
 
-  return (
-    <div className="flex xl:flex-wrap gap-5 pb-3 pt-15 px-10 bg-[#f2f2f2]">
+  return reviews.length ? (
+    <div className="flex flex-col w-full items-center md:items-start md:w-fit md:flex-row md:flex-wrap gap-5 pb-20 px-10 bg-[#f2f2f2]">
       {reviews.map((val, idx) => (
         <CRUDReviewCard
           review={val}
@@ -108,6 +108,10 @@ function PostList(props: {
         />
       ))}
     </div>
+  ) : (
+    <p className="text-center text-neutral-700">
+      No results, maybe create a review?
+    </p>
   );
 }
 

@@ -72,7 +72,7 @@ function RestPage() {
   return (
     <div className="min-h-full flex flex-col gap-5 md:gap-10">
       {/* User's search parameters */}
-      <div className="bg-[#f2f2f2] px-10 pt-[60px] border-b-2 border-b-neutral-200 pb-5 flex justify-between items-end">
+      <div className="bg-[#f2f2f2] px-7 md:px-10 pt-[60px] border-b-2 border-b-neutral-200 pb-5 flex justify-between items-end">
         <div>
           <p className="pt-5 text-2xl">{rest.name}</p>
           <div className="flex items-center gap-3 mt-3">
@@ -82,10 +82,17 @@ function RestPage() {
         </div>
         {user && (
           <Link
-            className="px-3 py-2 bg-blue-200 hover:bg-blue-300 rounded-lg"
+            className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
             href={`/posts?restaurantId=${searchParams.get("id")!}`}
           >
-            Manage Reviews
+            <p className="hidden xl:block">Manage Reviews</p>
+            <Image
+              src="/svgs/bplus.svg"
+              width={20}
+              height={20}
+              alt="manage reviews"
+              className="block xl:hidden opacity-50"
+            />
           </Link>
         )}
       </div>
@@ -93,8 +100,8 @@ function RestPage() {
       {/* Restaurants display */}
       <div className="xl:grid grid-cols-3 2xl:grid-cols-7 pb-15">
         <div className="col-span-2 2xl:col-span-5">
-          <div className="pl-15 w-fit">
-            <p>Cuisine: Fix Me</p>
+          <div className="pl-10 w-fit">
+            {/* <p>Cuisine: Fix Me</p> */}
             {rest.phone && (
               <div className="flex gap-5 items-center mt-3 opacity-60">
                 <Image
@@ -124,31 +131,37 @@ function RestPage() {
               </a>
             )}
           </div>
-          <p className="mt-10 pl-15 mb-3 md:mb-5 text-2xl md:text-3xl">
+          <p className="mt-10 pl-10 mb-3 md:mb-5 text-2xl md:text-3xl">
             Reviews
           </p>
-          <div className="flex xl:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10">
-            {reviews.map((val, idx) => (
-              <button
-                key={idx}
-                className="cursor-pointer text-start"
-                onClick={async () => {
-                  const prRes = await getPopulatedReview(val._id.toString());
-                  const rerr = prRes.anticipate();
-                  if (rerr.error) {
-                    console.log(
-                      `Error: failed to open review: ${rerr.message}`,
-                    );
-                  } else {
-                    setSelReview(prRes.unwrap());
-                    setShowRRM(true);
-                  }
-                }}
-              >
-                <ReviewCard review={val} key={idx} />
-              </button>
-            ))}
-          </div>
+          {reviews.length ? (
+            <div className="flex flex-col md:flex-row md:flex-wrap gap-5 overflow-x-scroll scrollbar-none pb-3 px-10 w-full items-center md:items-start">
+              {reviews.map((val, idx) => (
+                <button
+                  key={idx}
+                  className="cursor-pointer text-start"
+                  onClick={async () => {
+                    const prRes = await getPopulatedReview(val._id.toString());
+                    const rerr = prRes.anticipate();
+                    if (rerr.error) {
+                      console.log(
+                        `Error: failed to open review: ${rerr.message}`,
+                      );
+                    } else {
+                      setSelReview(prRes.unwrap());
+                      setShowRRM(true);
+                    }
+                  }}
+                >
+                  <ReviewCard review={val} key={idx} />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-neutral-700">
+              No results, maybe create a review?
+            </p>
+          )}
         </div>
 
         <div className="hidden xl:block w-full h-full 2xl:col-span-2 relative">

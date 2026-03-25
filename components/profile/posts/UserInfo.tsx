@@ -56,30 +56,28 @@ function UserInfo(props: {
   }, [user, isLoading, router, reviews]);
 
   return (
-    <div className="flex items-center justify-center gap-6 border-b border-neutral-200 py-6 bg-white">
-      {/* Profile Picture */}
-      <div className="flex items-end justify-center">
-        <div className="relative h-24 w-24 flex-none">
+    <div className="border-b border-neutral-200 py-6 bg-white px-5 lg:flex lg:justify-center">
+      <div className="flex justify-between gap-6 lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+        {/* Profile Picture */}
+        <div className="flex items-stretch">
           <Image
             src={user ? user.picture! : "/profile.png"}
             alt="profile pic"
             width={128}
             height={128}
-            className="rounded-full object-contain"
+            className="rounded-full object-contain w-18 h-18 md:w-24 md:h-24 my-auto"
           />
-        </div>
 
-        {/* User Info */}
-        <div className="pl-5 flex-1 min-w-0">
-          <p className="text-2xl font-medium">
-            {user ? user.given_name : "Loading..."}
-          </p>
-          <p className="text-gray-500 mt-3 text-sm/4! line-clamp-2">
-            {user ? user.email : ""}
-          </p>
+          {/* User Info */}
+          <div className="pl-5 flex-col">
+            <p className="md:text-2xl font-medium">
+              {user ? user.name : "Loading..."}
+            </p>
+            <p className="text-gray-500 md:mt-3 text-sm/4! line-clamp-2 hidden md:block">
+              {user && user.name !== user.email ? user.email : ""}
+            </p>
 
-          <div className="mt-4 flex items-center">
-            <div className="flex gap-16">
+            <div className="mt-4 flex flex-col lg:flex-row lg:gap-16 text-sm md:text-lg">
               <p>Reviews: {stats ? stats.numReviews : 0}</p>
               <p>Restaurant Visits: {stats ? stats.numRestaurants : 0}</p>
               <p>Collections: {stats ? stats.numCollections : 0}</p>
@@ -89,7 +87,7 @@ function UserInfo(props: {
 
         <div
           className={
-            "flex flex-col pl-50 gap-3 " +
+            "flex flex-col gap-3 mt-auto " +
             (searchParams.get("restaurantId") === null
               ? "items-center"
               : "items-end")
@@ -98,23 +96,24 @@ function UserInfo(props: {
           {searchParams.get("restaurantId") === null && (
             <div className="flex flex-col items-center">
               <button
-                className="mt-auto rounded-md bg-blue-300 hover:bg-blue-700 px-4 py-2 text-white"
+                className="mt-auto md:rounded-md bg-blue-300 hover:bg-blue-700 md:px-4 md:py-2 p-1 rounded-full text-white"
                 onClick={() => setShowSelectRest((prev) => !prev)}
               >
-                Select Restaurant
+                <p className="hidden md:block">Select Restaurant</p>
+                <Image
+                  src="/svgs/world.svg"
+                  width={32}
+                  height={32}
+                  alt="manage reviews"
+                  className="block md:hidden opacity-50"
+                />
               </button>
-
-              {rest && (
-                <p className="text-center w-fit text-neutral-700">
-                  Location: {rest.name}
-                </p>
-              )}
             </div>
           )}
 
           <button
             className={
-              "rounded-md px-4 py-2 text-white " +
+              "md:rounded-md md:px-4 md:py-2 text-white p-2 rounded-full " +
               (searchParams.get("restaurantId") || rest
                 ? "bg-blue-300 hover:bg-blue-700"
                 : "bg-blue-200 disabled")
@@ -124,10 +123,24 @@ function UserInfo(props: {
               setShowReviewModal((prev) => !prev);
             }}
           >
-            Create Review
+            <p className="hidden md:block">Create Review</p>
+            <Image
+              src="/svgs/bplus.svg"
+              width={24}
+              height={24}
+              alt="manage reviews"
+              className="block md:hidden opacity-50"
+            />
           </button>
         </div>
       </div>
+
+      <p className="text-center mt-3 text-neutral-700 text-sm md:text-md">
+        {rest && `Location: ${rest.name}`}
+        {!searchParams.get("restaurantId") &&
+          !rest &&
+          "Select a restaurant to make a review!"}
+      </p>
 
       <SelectRestModal
         visible={showSelectRest}

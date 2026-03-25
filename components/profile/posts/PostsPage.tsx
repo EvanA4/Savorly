@@ -50,6 +50,7 @@ function PostsPage() {
           reviews={reviews}
         />
 
+        <p className="pl-10 text-2xl mt-15 mb-3">Your Posts</p>
         <PostList
           reviews={reviews}
           setReviews={setReviews}
