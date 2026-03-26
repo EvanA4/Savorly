@@ -24,6 +24,10 @@ const reviewSchema = new Schema(
       type: String,
       required: true,
     },
+    budget: {
+      type: Number,
+      required: true,
+    },
     // photos: {
     //   type: [Schema.Types.ObjectId],
     //   ref: "Images",

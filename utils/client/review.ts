@@ -80,6 +80,7 @@ function getReviewFormData(src: {
   title: string;
   description: string;
   rating: number;
+  budget: number;
   tags: string[];
   imagesToCreate: File[];
   imagesToDelete?: IImage[];
@@ -89,6 +90,7 @@ function getReviewFormData(src: {
   formData.append("title", src.title);
   formData.append("description", src.description);
   formData.append("rating", src.rating.toString());
+  formData.append("budget", src.budget.toString());
   for (const idx in src.tags) formData.append("tags", src.tags[idx]);
   for (const idx in src.imagesToCreate)
     formData.append("images", src.imagesToCreate[idx]);
@@ -109,6 +111,7 @@ export async function createReview(
     title: string;
     description: string;
     rating: number;
+    budget: number;
     tags: string[];
     imagesToCreate: File[];
   },
@@ -128,6 +131,7 @@ export async function updateReview(review: {
   title: string;
   description: string;
   rating: number;
+  budget: number;
   tags: string[];
   imagesToCreate: File[];
   imagesToDelete: IImage[];
@@ -161,4 +165,12 @@ export async function getReviewsBySearchStr(
   const rawRes = await fetch(url);
   const apiRes = (await rawRes.json()) as APIResult<ReviewDocument[]>;
   return new Result<ReviewDocument[]>(apiRes);
+}
+
+export function getBudgetStr(budget: number) {
+  // assumes budget is an int in range [1, 3]
+  if (budget == 0) return "";
+  else if (budget == 1) return "$";
+  else if (budget == 2) return "$$";
+  else return "$$$";
 }

@@ -1,6 +1,5 @@
 import { ReviewDocument } from "@/models/Review";
 import { APIResult } from "@/types/results";
-import dbConnect from "@/utils/dbconnect";
 import { getReviewsByRestaurantId } from "@/utils/server/review";
 import { NextRequest, NextResponse } from "next/server";
 
