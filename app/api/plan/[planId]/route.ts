@@ -2,7 +2,7 @@ import PlanModel from "@/models/Plan";
 import PlanRestaurantModel from "@/models/PlanRestaurant";
 
 import dbConnect from "@/utils/dbconnect";
-import { deletePlan } from "@/utils/server/plan";
+import { deletePlan, getRestaurantsInPlan } from "@/utils/server/plan";
 import { NextRequest, NextResponse } from "next/server";
 
 // DELETE (delete plan)
@@ -46,15 +46,50 @@ export const GET = async function (
   if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const plan = await PlanModel.find({ _id: planId });
-
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+  try {
+    const plan = await PlanModel.findById(planId);
+    console.log(plan);
+    if (!plan) {
+      return NextResponse.json(
+        {
+          error: true,
+          message: "Plan not found",
+          value: undefined,
+        },
+        { status: 404 },
+      );
+    }
+  } catch (e) {
+    const err = e as { message?: string };
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to get plan: ${err.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
   // get all restaurants in the plan
-  const restaurants = await PlanRestaurantModel.find({ planId: planId });
+  const restaurants = await getRestaurantsInPlan(planId);
+  const rerr = restaurants.anticipate();
+  if (rerr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to get restaurants in plan: ${rerr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  return NextResponse.json({ plan, restaurants }, { status: 200 });
+  return NextResponse.json({
+    error: false,
+    message: "Successfully retrieved planRestaurants.",
+    value: restaurants.unwrap(),
+  });
 };
 
 // PUT (update plan name)

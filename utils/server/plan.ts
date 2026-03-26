@@ -1,5 +1,7 @@
 import PlanModel, { PlanDocument } from "@/models/Plan";
-import PlanRestaurantModel from "@/models/PlanRestaurant";
+import PlanRestaurantModel, {
+  PlanRestaurantDocument,
+} from "@/models/PlanRestaurant";
 import { Result } from "@/types/results";
 
 import dbConnect from "../dbconnect";
@@ -61,7 +63,7 @@ export async function getUserPlans(
   }
 }
 
-// TODO: DELETE plan/{planId}
+// DELETE plan/{planId}
 export async function deletePlan(
   planId: string,
 ): Promise<Result<PlanDocument>> {
@@ -115,7 +117,33 @@ export async function deletePlan(
   }
 }
 
-// TODO: GET plan/{planId}
+// GET plan/{planId}
+export async function getRestaurantsInPlan(
+  planId: string,
+): Promise<Result<PlanRestaurantDocument[]>> {
+  try {
+    await dbConnect();
+
+    const planRestaurants = (await PlanRestaurantModel.find({
+      planId: planId,
+    })) as PlanRestaurantDocument[];
+    return new Result<PlanRestaurantDocument[]>({
+      error: false,
+      message: "Successfully retrieved planRestaurants.",
+      value: planRestaurants,
+    });
+  } catch (e) {
+    const err = e as { message?: string };
+    return new Result<PlanRestaurantDocument[]>({
+      error: true,
+      message:
+        err.message != undefined
+          ? err.message
+          : "Failed to look up planRestaurants.",
+      value: undefined,
+    });
+  }
+}
 
 // TODO: PUT plan/{planId}
 
