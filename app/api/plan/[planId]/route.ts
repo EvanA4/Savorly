@@ -1,6 +1,4 @@
 import PlanModel from "@/models/Plan";
-import PlanRestaurantModel from "@/models/PlanRestaurant";
-
 import dbConnect from "@/utils/dbconnect";
 import {
   deletePlan,
