@@ -7,7 +7,7 @@ import { Result } from "@/types/results";
 import dbConnect from "../dbconnect";
 import { startSession } from "mongoose";
 
-// POST plan/user/{userId}
+// POST plan/user/[userId]
 export async function createPlan(
   userId: string,
   planName: string,
@@ -38,7 +38,7 @@ export async function createPlan(
   }
 }
 
-// GET plan/user/{userId}
+// GET plan/user/[userId]
 export async function getUserPlans(
   userId: string,
 ): Promise<Result<PlanDocument[]>> {
@@ -63,7 +63,7 @@ export async function getUserPlans(
   }
 }
 
-// DELETE plan/{planId}
+// DELETE plan/[planId]
 export async function deletePlan(
   planId: string,
 ): Promise<Result<PlanDocument>> {
@@ -117,7 +117,7 @@ export async function deletePlan(
   }
 }
 
-// GET plan/{planId}
+// GET plan/[planId]
 export async function getRestaurantsInPlan(
   planId: string,
 ): Promise<Result<PlanRestaurantDocument[]>> {
@@ -145,10 +145,38 @@ export async function getRestaurantsInPlan(
   }
 }
 
-// TODO: PUT plan/{planId}
+// TODO: PUT plan/[planId]
+export async function updatePlan(
+  planId: string,
+  name: string,
+): Promise<Result<PlanDocument>> {
+  try {
+    await dbConnect();
 
-// TODO: POST plan/{planId}/restaurant/{restaurantId}
+    const updated = await PlanModel.findByIdAndUpdate(
+      planId,
+      { name: name },
+      { returnDocument: "after" },
+    );
 
-// TODO: DELETE plan/{planId}/restaurant/{restaurantId}
+    return new Result<PlanDocument>({
+      error: false,
+      message: "Successfully updated plan.",
+      value: updated,
+    });
+  } catch (e) {
+    const err = e as { message?: string };
+    return new Result<PlanDocument>({
+      error: true,
+      message:
+        err.message != undefined ? err.message : "Failed to update plan.",
+      value: undefined,
+    });
+  }
+}
 
-// TODO: GET plan/{planId}/restaurant/{restaurantId}
+// TODO: POST plan/[planId]/restaurant/[restaurantId]
+
+// TODO: DELETE plan/[planId]/restaurant/[restaurantId]
+
+// TODO: GET plan/[planId]/restaurant/[restaurantId]

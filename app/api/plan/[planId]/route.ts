@@ -2,7 +2,11 @@ import PlanModel from "@/models/Plan";
 import PlanRestaurantModel from "@/models/PlanRestaurant";
 
 import dbConnect from "@/utils/dbconnect";
-import { deletePlan, getRestaurantsInPlan } from "@/utils/server/plan";
+import {
+  deletePlan,
+  getRestaurantsInPlan,
+  updatePlan,
+} from "@/utils/server/plan";
 import { NextRequest, NextResponse } from "next/server";
 
 // DELETE (delete plan)
@@ -104,22 +108,35 @@ export const PUT = async function (
   if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const body = await req.json();
-  const name = body.name;
-  if (!name)
+  let body: { name?: string } | null = null;
+  try {
+    body = await req.json();
+  } catch {
     return NextResponse.json(
-      { message: "Plan name required" },
+      { error: true, message: "Plan name required in body" },
       { status: 400 },
     );
+  }
+  const name = body?.name;
+  if (!name) {
+    return NextResponse.json(
+      { error: true, message: "Plan name required" },
+      { status: 400 },
+    );
+  }
 
-  const plan = await PlanModel.findOneAndUpdate(
-    { _id: planId },
-    { name },
-    { new: true },
-  );
+  const updated = await updatePlan(planId, name);
+  const perr = updated.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to update plan: ${perr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
-
-  return NextResponse.json(plan, { status: 200 });
+  return NextResponse.json(updated.unwrap(), { status: 200 });
 };
