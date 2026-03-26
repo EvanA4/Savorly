@@ -1,5 +1,5 @@
-import { Tag } from "@/types/tag";
 import { Model, Schema, model, models, Document } from "mongoose";
+import { Tag } from "../types/tag";
 
 const tagSchema = new Schema({
   restaurantId: {
