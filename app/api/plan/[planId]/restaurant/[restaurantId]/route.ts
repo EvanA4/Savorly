@@ -4,7 +4,10 @@ import { getRestaurantById } from "@/utils/server/restaurant";
 
 import dbConnect from "@/utils/dbconnect";
 import { NextRequest, NextResponse } from "next/server";
-import { addRestaurantToPlan } from "@/utils/server/plan";
+import {
+  addRestaurantToPlan,
+  deleteRestaurantFromPlan,
+} from "@/utils/server/plan";
 
 // POST (add restaurant to plan)
 export const POST = async function (
@@ -17,27 +20,22 @@ export const POST = async function (
 
   // Check if planId is valid
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan ID required",
+      },
+      { status: 400 },
+    );
 
   try {
-    const plan = await PlanModel.findById(planId);
-    if (!plan) {
-      return NextResponse.json(
-        {
-          error: true,
-          message: "Plan not found",
-          value: undefined,
-        },
-        { status: 404 },
-      );
-    }
+    await PlanModel.findById(planId);
   } catch (e) {
     const err = e as { message?: string };
     return NextResponse.json(
       {
         error: true,
         message: `Failed to find plan: ${err.message}`,
-        value: undefined,
       },
       { status: 400 },
     );
@@ -46,7 +44,10 @@ export const POST = async function (
   // Check if restaurantId is valid
   if (!restaurantId)
     return NextResponse.json(
-      { message: "Restaurant ID required" },
+      {
+        error: true,
+        message: "Restaurant ID required",
+      },
       { status: 400 },
     );
 
@@ -54,7 +55,10 @@ export const POST = async function (
   const restExists = restaurant.anticipate();
   if (restExists.error) {
     return NextResponse.json(
-      { message: "Restaurant not found" },
+      {
+        error: true,
+        message: "Restaurant not found",
+      },
       { status: 404 },
     );
   }
@@ -67,7 +71,10 @@ export const POST = async function (
 
   if (isInPlan) {
     return NextResponse.json(
-      { message: "Restaurant is already in the plan" },
+      {
+        error: true,
+        message: "Restaurant is already in the plan",
+      },
       { status: 400 },
     );
   }
@@ -80,7 +87,6 @@ export const POST = async function (
       {
         error: true,
         message: `Failed to add restaurant to plan: ${perr.message}`,
-        value: undefined,
       },
       { status: 400 },
     );
@@ -100,33 +106,57 @@ export const DELETE = async function (
 
   // Check if planId is valid
   if (!planId)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const plan = await PlanModel.findOne({ _id: planId });
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+  try {
+    await PlanModel.findById(planId);
+  } catch (e) {
+    const err = e as { message?: string };
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to find plan: ${err.message}`,
+      },
+      { status: 400 },
+    );
+  }
 
   // Check if restaurantId is valid
   if (!restaurantId)
     return NextResponse.json(
-      { message: "Restaurant not found." },
-      { status: 404 },
-    );
-
-  const isRestaurant =
-    (await getRestaurantById(restaurantId as string)) != undefined;
-  if (!isRestaurant)
-    return NextResponse.json(
-      { message: "Restaurant ID is invalid" },
+      {
+        error: true,
+        message: "Restaurant ID required",
+      },
       { status: 400 },
     );
 
-  // Delete the PlanRestaurant document
+  const restaurant = await getRestaurantById(restaurantId);
+  const restExists = restaurant.anticipate();
+  if (restExists.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Restaurant not found",
+      },
+      { status: 404 },
+    );
+  }
 
-  return NextResponse.json(
-    { message: "Restaurant removed from plan" },
-    { status: 200 },
-  );
+  // Delete the PlanRestaurant document
+  const planRestaurant = await deleteRestaurantFromPlan(planId, restaurantId);
+  const perr = planRestaurant.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to delete restaurant from plan: ${perr.message}`,
+      },
+      { status: 400 },
+    );
+  }
+
+  return NextResponse.json(planRestaurant.unwrap());
 };
 
 // GET (Verify if restaurant is in the plan)
@@ -140,23 +170,41 @@ export const GET = async function (
 
   // Check if planId is valid
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan ID required",
+      },
+      { status: 400 },
+    );
 
   const plan = await PlanModel.findOne({ _id: planId });
   if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan not found",
+      },
+      { status: 404 },
+    );
 
   // Check if restaurantId is valid
   if (!restaurantId)
     return NextResponse.json(
-      { message: "Restaurant ID required" },
+      {
+        error: true,
+        message: "Restaurant ID required",
+      },
       { status: 400 },
     );
 
   const restaurant = await getRestaurantById(restaurantId);
   if (!restaurant)
     return NextResponse.json(
-      { message: "Restaurant not found" },
+      {
+        error: true,
+        message: "Restaurant not found",
+      },
       { status: 404 },
     );
 

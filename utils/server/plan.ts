@@ -206,6 +206,42 @@ export async function addRestaurantToPlan(
   }
 }
 
-// TODO: DELETE plan/[planId]/restaurant/[restaurantId]
+// DELETE plan/[planId]/restaurant/[restaurantId]
+export async function deleteRestaurantFromPlan(
+  planId: string,
+  restaurantId: string,
+): Promise<Result<PlanRestaurantDocument>> {
+  try {
+    await dbConnect();
+
+    const planRest = await PlanRestaurantModel.findOneAndDelete({
+      planId,
+      restaurantId,
+    });
+
+    if (!planRest) {
+      return new Result<PlanRestaurantDocument>({
+        error: true,
+        message: "Restaurant not found in plan.",
+      });
+    }
+
+    return new Result<PlanRestaurantDocument>({
+      error: false,
+      message: "Successfully deleted restaurant from plan.",
+      value: planRest,
+    });
+  } catch (e) {
+    const err = e as { message?: string };
+    return new Result<PlanRestaurantDocument>({
+      error: true,
+      message:
+        err.message != undefined
+          ? err.message
+          : "Failed to delete restaurant from plan.",
+      value: undefined,
+    });
+  }
+}
 
 // TODO: GET plan/[planId]/restaurant/[restaurantId]
