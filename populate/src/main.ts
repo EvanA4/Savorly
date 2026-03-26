@@ -2,6 +2,8 @@ import { exit } from "process";
 import dbConnect from "./utils/dbconnect";
 import { clearDB } from "./utils/cleardb";
 import { fillDB } from "./utils/filldb";
+import { readFileSync } from "fs";
+import { RESTS } from "./utils/consts";
 
 // parameters
 // const N_REVIEWS = 100;
@@ -10,9 +12,6 @@ import { fillDB } from "./utils/filldb";
 
 async function main() {
   console.log("Connecting to database...");
-  const users = process.env.USERS!.split(",");
-  console.log(users);
-
   await dbConnect();
   await clearDB();
   await fillDB();
