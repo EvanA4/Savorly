@@ -7,6 +7,14 @@ export type Restaurant = {
   lng: number;
 };
 
+export type RestaurantStats = {
+  poiId: string;
+  avgRating: number;
+  avgBudget: number;
+  reviewCount: number;
+  imageId: string | null;
+};
+
 export const RESTAURANT_TYPES = [
   "African", // african_restaurant
   "American", // american_restaurant

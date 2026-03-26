@@ -6,10 +6,14 @@ import ReviewCard from "./ReviewCard";
 import Rating from "./Rating";
 import { useUser } from "@auth0/nextjs-auth0";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Restaurant } from "@/types/restaurant";
-import { getRestaurantById } from "@/utils/client/restaurant";
+import { Restaurant, RestaurantStats } from "@/types/restaurant";
+import {
+  getRestaurantById,
+  getRestaurantStatsById,
+} from "@/utils/client/restaurant";
 import Link from "next/link";
 import {
+  getBudgetStr,
   getPopulatedReview,
   getReviewsByRestaurantId,
 } from "@/utils/client/review";
@@ -26,6 +30,13 @@ function RestPage() {
     website: "...",
     lat: -1,
     lng: -1,
+  });
+  const [restStats, setRestStats] = useState<RestaurantStats>({
+    poiId: "",
+    avgRating: 5,
+    avgBudget: 3,
+    reviewCount: 0,
+    imageId: null,
   });
   const [reviews, setReviews] = useState<ReviewDocument[]>([]);
   const searchParams = useSearchParams();
@@ -44,6 +55,17 @@ function RestPage() {
     }
 
     setRest(restaurantRes.unwrap());
+  }
+
+  async function fetchRestStats() {
+    const restStatsRes = await getRestaurantStatsById(searchParams.get("id")!);
+    const rerr = restStatsRes.anticipate();
+
+    if (rerr.error) {
+      router.back();
+    }
+
+    setRestStats(restStatsRes.unwrap());
   }
 
   async function fetchReviews() {
@@ -66,6 +88,7 @@ function RestPage() {
       }
       fetchRest();
       fetchReviews();
+      fetchRestStats();
     }
   }, [searchParams, router, user, isLoading]);
 
@@ -76,8 +99,15 @@ function RestPage() {
         <div>
           <p className="pt-5 text-2xl">{rest.name}</p>
           <div className="flex items-center gap-3 mt-3">
-            <Rating value={2.5} />
-            <p className="text-[11px] 2xl:text-[13px]">135 Reviews</p>
+            <Rating value={restStats.avgRating} />
+            <p className="text-[11px] 2xl:text-[13px]">
+              {restStats.reviewCount == 1
+                ? "1 Review"
+                : `${restStats.reviewCount} Reviews`}
+            </p>
+            <p className="text-neutral-600">
+              {getBudgetStr(restStats.avgBudget)}
+            </p>
           </div>
         </div>
         {user && (

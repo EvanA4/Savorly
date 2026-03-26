@@ -1,5 +1,7 @@
 // api/restaurant/stats/[poiId]
 import ReviewModel from "@/models/Review";
+import { RestaurantStats } from "@/types/restaurant";
+import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
 import { getRestaurantById } from "@/utils/server/restaurant";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,14 +9,14 @@ import { NextRequest, NextResponse } from "next/server";
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { poiId: string } },
-) {
+): Promise<NextResponse<APIResult<RestaurantStats>>> {
   await dbConnect();
 
   // poiId must be valid
   const { poiId } = await params;
   if (!poiId) {
     return NextResponse.json(
-      { message: "POI ID is required" },
+      { error: true, message: "POI ID is required" },
       { status: 400 },
     );
   }
@@ -40,7 +42,7 @@ export const GET = async function (
       },
     },
   ]);
-  const avgRating = avg_rating?.avgRating ?? 0;
+  const avgRating = (avg_rating?.avgRating as number) ?? 0;
 
   // get average budget
   const [avg_budget] = await ReviewModel.aggregate([
@@ -65,10 +67,14 @@ export const GET = async function (
   const imageId = (firstReview as { images?: string[] })?.images?.[0] ?? null;
 
   return NextResponse.json({
-    poiId,
-    avgRating,
-    avgBudget,
-    reviewCount,
-    imageId,
+    error: false,
+    message: "Successfully retrieved restaurant statistics!",
+    value: {
+      poiId,
+      avgRating,
+      avgBudget,
+      reviewCount,
+      imageId,
+    },
   });
 };

@@ -169,7 +169,8 @@ export async function getReviewsBySearchStr(
 
 export function getBudgetStr(budget: number) {
   // assumes budget is an int in range [1, 3]
-  if (budget == 1) return "$";
+  if (budget == 0) return "";
+  else if (budget == 1) return "$";
   else if (budget == 2) return "$$";
   else return "$$$";
 }
