@@ -4,6 +4,7 @@ import Rating from "../../rest/Rating";
 import Image from "next/image";
 import { ReviewDocument } from "@/models/Review";
 import { getImagesByReviewId } from "@/utils/client/image";
+import { getBudgetStr } from "@/utils/client/review";
 
 function CRUDReviewCard(props: {
   review: ReviewDocument;
@@ -56,6 +57,11 @@ function CRUDReviewCard(props: {
         <b className="text-black">{props.review.title}</b>
         <div className="flex items-center gap-3">
           <Rating value={props.review.rating} />
+          {props.review.budget && (
+            <p className="text-neutral-600">
+              {getBudgetStr(props.review.budget)}
+            </p>
+          )}
         </div>
         {/* <p className="text-[14px] text-blue-400">{props.review.name}</p> */}
         <p className="text-[10px] 2xl:text-[12px] 3xl:text-[14px]">

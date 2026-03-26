@@ -21,6 +21,7 @@ function ReviewModal(props: {
   const [titleInput, setTitleInput] = useState<string>("");
   const [descInput, setDescInput] = useState<string>("");
   const [ratingInput, setRatingInput] = useState<number>(0);
+  const [budgetInput, setBudgetInput] = useState<number>(0);
   const [imagesInput, setImagesInput] = useState<File[]>([]);
   const [prevImagesInput, setPrevImagesInput] = useState<boolean[]>([]);
 
@@ -30,6 +31,7 @@ function ReviewModal(props: {
       setTags(props.review.tags.map((val) => val.label as unknown as string));
       setDescInput(props.review.description);
       setRatingInput(props.review.rating);
+      setBudgetInput(props.review.budget);
       setPrevImagesInput(Array(props.review.images.length).fill(true));
     }
   }, [props.review]);
@@ -40,6 +42,7 @@ function ReviewModal(props: {
       title: titleInput,
       description: descInput,
       rating: ratingInput,
+      budget: budgetInput,
       tags: tags,
       imagesToCreate: imagesInput,
     };
@@ -62,6 +65,7 @@ function ReviewModal(props: {
               title: titleInput,
               description: descInput,
               rating: ratingInput,
+              budget: budgetInput,
             } as ReviewDocument,
           ]);
         }
@@ -92,6 +96,7 @@ function ReviewModal(props: {
                     title: titleInput,
                     description: descInput,
                     rating: ratingInput,
+                    budget: budgetInput,
                   } as ReviewDocument),
             ),
           );
@@ -124,6 +129,13 @@ function ReviewModal(props: {
           placeholder="Rating"
           onChange={(e) => setRatingInput(parseFloat(e.target.value))}
           value={ratingInput}
+        />
+        <input
+          type="number"
+          className="bg-white shadow-md p-3 w-full rounded-lg border border-neutral-300"
+          placeholder="Budget"
+          onChange={(e) => setBudgetInput(parseFloat(e.target.value))}
+          value={budgetInput}
         />
         <TagSelect tags={tags} setTags={setTags} />
 

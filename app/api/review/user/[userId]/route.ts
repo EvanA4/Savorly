@@ -156,8 +156,9 @@ export const POST = async function (
       { status: 400 },
     );
   }
-  const isRestaurant =
-    (await getRestaurantById(restIdArr[0] as string)) != undefined;
+  const isRestaurant = !(
+    await getRestaurantById(restIdArr[0] as string)
+  ).anticipate().error;
   if (!isRestaurant) {
     return NextResponse.json(
       {

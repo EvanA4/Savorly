@@ -6,6 +6,7 @@ import { getImagesByReviewId } from "@/utils/client/image";
 import Rating from "./Rating";
 import { MAPIUser } from "@/types/auth0/mapi_user";
 import { getUserById } from "@/utils/client/users";
+import { getBudgetStr } from "@/utils/client/review";
 
 function ReviewCard(props: { review: ReviewDocument }) {
   const [imageSrc, setImageSrc] = useState("");
@@ -60,6 +61,11 @@ function ReviewCard(props: { review: ReviewDocument }) {
         <b className="text-black">{props.review.title}</b>
         <div className="flex items-center gap-3">
           <Rating value={props.review.rating} />
+          {props.review.budget && (
+            <p className="text-neutral-600">
+              {getBudgetStr(props.review.budget)}
+            </p>
+          )}
         </div>
         {user && <p>{user.name}</p>}
         {/* <p className="text-[14px] text-blue-400">{props.review.name}</p> */}

@@ -268,6 +268,7 @@ export async function updateReview(review: {
       restaurantId: updated.restaurantId,
       rating: updated.rating,
       description: updated.description,
+      budget: updated.budget,
       title: updated.title,
       _id: updated._id,
       tags,
@@ -417,7 +418,7 @@ export async function getReviewsBySearchStr(
     let constraints = {};
     if (restaurantId && userId) constraints = { restaurantId, userId };
     else if (restaurantId) constraints = { restaurantId };
-    else constraints = { userId };
+    else if (userId) constraints = { userId };
     const descReviews = await ReviewModel.find({
       description: new RegExp(".*" + search + ".*", "i"),
       ...constraints,
