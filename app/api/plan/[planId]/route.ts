@@ -1,5 +1,5 @@
 import PlanModel, { PlanDocument } from "@/models/Plan";
-import { PlanRestaurantDocument } from "@/models/PlanRestaurant";
+import { Restaurant } from "@/types/restaurant";
 import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
 import {
@@ -42,7 +42,7 @@ export const DELETE = async function (
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { planId: string } },
-): Promise<NextResponse<APIResult<PlanRestaurantDocument[]>>> {
+): Promise<NextResponse<APIResult<Restaurant[]>>> {
   await dbConnect();
 
   const { planId } = await params;
@@ -59,7 +59,6 @@ export const GET = async function (
 
   try {
     const plan = await PlanModel.findById(planId);
-    console.log(plan);
     if (!plan) {
       return NextResponse.json(
         {

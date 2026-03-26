@@ -6,6 +6,8 @@ import { Result } from "@/types/results";
 
 import dbConnect from "../dbconnect";
 import { startSession } from "mongoose";
+import { Restaurant } from "@/types/restaurant";
+import { getRestaurantById } from "./restaurant";
 
 // POST plan/user/[userId]
 export async function createPlan(
@@ -120,21 +122,31 @@ export async function deletePlan(
 // GET plan/[planId]
 export async function getRestaurantsInPlan(
   planId: string,
-): Promise<Result<PlanRestaurantDocument[]>> {
+): Promise<Result<Restaurant[]>> {
   try {
     await dbConnect();
 
-    const planRestaurants = (await PlanRestaurantModel.find({
-      planId: planId,
-    })) as PlanRestaurantDocument[];
-    return new Result<PlanRestaurantDocument[]>({
+    const planRestaurants = await PlanRestaurantModel.find({ planId });
+    const restaurantIds = planRestaurants.map((pr) => pr.restaurantId);
+
+    const restaurantResults = await Promise.all(
+      restaurantIds.map((id) => getRestaurantById(id)),
+    );
+
+    // Filter out any failed lookups
+    const restaurants = restaurantResults
+      .filter((result) => !result.anticipate().error)
+      .map((result) => result.unwrap());
+    console.log(restaurants);
+
+    return new Result<Restaurant[]>({
       error: false,
       message: "Successfully retrieved planRestaurants.",
-      value: planRestaurants,
+      value: restaurants,
     });
   } catch (e) {
     const err = e as { message?: string };
-    return new Result<PlanRestaurantDocument[]>({
+    return new Result<Restaurant[]>({
       error: true,
       message:
         err.message != undefined
