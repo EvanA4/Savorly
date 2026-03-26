@@ -1,14 +1,14 @@
 {
   "devDependencies": {
     "@types/node": "^24.0.12",
-    "dotenv": "^17.1.0",
+    "dotenv": "^17.3.1",
     "install": "^0.13.0",
     "npm": "^11.4.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "populate": "pnpm exec ts-node src/main.ts"
+    "populate": "pnpm exec ts-node src/main.ts --env-file=.env"
   },
   "dependencies": {
     "mongoose": "^9.1.5",

@@ -1,5 +1,5 @@
-import { Review } from "@/types/review";
 import { Model, Schema, model, models, Document } from "mongoose";
+import { Review } from "../types/review";
 
 const reviewSchema = new Schema(
   {
@@ -22,6 +22,10 @@ const reviewSchema = new Schema(
     },
     title: {
       type: String,
+      required: true,
+    },
+    budget: {
+      type: Number,
       required: true,
     },
     // photos: {
