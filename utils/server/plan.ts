@@ -223,6 +223,7 @@ export async function deleteRestaurantFromPlan(
       return new Result<PlanRestaurantDocument>({
         error: true,
         message: "Restaurant not found in plan.",
+        value: undefined,
       });
     }
 
@@ -245,3 +246,38 @@ export async function deleteRestaurantFromPlan(
 }
 
 // TODO: GET plan/[planId]/restaurant/[restaurantId]
+export async function getPlanRestaurant(
+  planId: string,
+  restaurantId: string,
+): Promise<Result<PlanRestaurantDocument>> {
+  try {
+    await dbConnect();
+    const planRest = await PlanRestaurantModel.findOne({
+      planId,
+      restaurantId,
+    });
+
+    if (!planRest) {
+      return new Result<PlanRestaurantDocument>({
+        error: true,
+        message: "Plan restaurant not found.",
+        value: undefined,
+      });
+    }
+    return new Result<PlanRestaurantDocument>({
+      error: false,
+      message: "Successfully found plan restaurant.",
+      value: planRest,
+    });
+  } catch (e) {
+    const err = e as { message?: string };
+    return new Result<PlanRestaurantDocument>({
+      error: true,
+      message:
+        err.message != undefined
+          ? err.message
+          : "Failed to find plan restaurant.",
+      value: undefined,
+    });
+  }
+}

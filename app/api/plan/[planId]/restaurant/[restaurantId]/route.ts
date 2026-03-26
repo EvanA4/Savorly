@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   addRestaurantToPlan,
   deleteRestaurantFromPlan,
+  getPlanRestaurant,
 } from "@/utils/server/plan";
 
 // POST (add restaurant to plan)
@@ -170,23 +171,20 @@ export const GET = async function (
 
   // Check if planId is valid
   if (!planId)
+    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+
+  try {
+    await PlanModel.findById(planId);
+  } catch (e) {
+    const err = e as { message?: string };
     return NextResponse.json(
       {
         error: true,
-        message: "Plan ID required",
+        message: `Failed to find plan: ${err.message}`,
       },
       { status: 400 },
     );
-
-  const plan = await PlanModel.findOne({ _id: planId });
-  if (!plan)
-    return NextResponse.json(
-      {
-        error: true,
-        message: "Plan not found",
-      },
-      { status: 404 },
-    );
+  }
 
   // Check if restaurantId is valid
   if (!restaurantId)
@@ -199,7 +197,8 @@ export const GET = async function (
     );
 
   const restaurant = await getRestaurantById(restaurantId);
-  if (!restaurant)
+  const restExists = restaurant.anticipate();
+  if (restExists.error) {
     return NextResponse.json(
       {
         error: true,
@@ -207,14 +206,22 @@ export const GET = async function (
       },
       { status: 404 },
     );
+  }
 
   // Check if restaurant is in the plan
   // returns NULL if restaurant is not in the plan
   // returns the planRestaurant document if restaurant is in the plan
-  const isInPlan = await PlanRestaurantModel.findOne({
-    planId: planId,
-    restaurantId: restaurantId,
-  });
+  const planRestaurant = await getPlanRestaurant(planId, restaurantId);
+  const perr = planRestaurant.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to get plan restaurant: ${perr.message}`,
+      },
+      { status: 400 },
+    );
+  }
 
-  return NextResponse.json(isInPlan, { status: 200 });
+  return NextResponse.json(planRestaurant.unwrap());
 };
