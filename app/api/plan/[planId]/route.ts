@@ -2,6 +2,7 @@ import PlanModel from "@/models/Plan";
 import PlanRestaurantModel from "@/models/PlanRestaurant";
 
 import dbConnect from "@/utils/dbconnect";
+import { deletePlan } from "@/utils/server/plan";
 import { NextRequest, NextResponse } from "next/server";
 
 // DELETE (delete plan)
@@ -17,17 +18,20 @@ export const DELETE = async function (
   if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const plan = await PlanModel.findOneAndDelete({
-    _id: planId,
-  });
+  const planRes = await deletePlan(planId);
+  const perr = planRes.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to delete plan: ${perr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
-
-  // delete all planRestaurants associated with the plan
-  await PlanRestaurantModel.deleteMany({ planId: planId });
-
-  return NextResponse.json(plan, { status: 200 });
+  return NextResponse.json(planRes.unwrap());
 };
 
 // GET (get all restaurants in a plan)
