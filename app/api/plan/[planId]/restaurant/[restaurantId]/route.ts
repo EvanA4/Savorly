@@ -1,5 +1,7 @@
 import PlanModel from "@/models/Plan";
-import PlanRestaurantModel from "@/models/PlanRestaurant";
+import PlanRestaurantModel, {
+  PlanRestaurantDocument,
+} from "@/models/PlanRestaurant";
 import { getRestaurantById } from "@/utils/server/restaurant";
 
 import dbConnect from "@/utils/dbconnect";
@@ -9,6 +11,7 @@ import {
   deleteRestaurantFromPlan,
   getPlanRestaurant,
 } from "@/utils/server/plan";
+import { APIResult } from "@/types/results";
 
 // POST (add restaurant to plan)
 export const POST = async function (
@@ -164,14 +167,21 @@ export const DELETE = async function (
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { planId: string; restaurantId: string } },
-) {
+): Promise<NextResponse<APIResult<PlanRestaurantDocument>>> {
   await dbConnect();
 
   const { planId, restaurantId } = await params;
 
   // Check if planId is valid
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan ID required",
+        value: undefined,
+      },
+      { status: 400 },
+    );
 
   try {
     await PlanModel.findById(planId);
@@ -181,6 +191,7 @@ export const GET = async function (
       {
         error: true,
         message: `Failed to find plan: ${err.message}`,
+        value: undefined,
       },
       { status: 400 },
     );
@@ -192,6 +203,7 @@ export const GET = async function (
       {
         error: true,
         message: "Restaurant ID required",
+        value: undefined,
       },
       { status: 400 },
     );
@@ -203,6 +215,7 @@ export const GET = async function (
       {
         error: true,
         message: "Restaurant not found",
+        value: undefined,
       },
       { status: 404 },
     );
@@ -217,11 +230,16 @@ export const GET = async function (
     return NextResponse.json(
       {
         error: true,
-        message: `Failed to get plan restaurant: ${perr.message}`,
+        message: `Failed to find plan restaurant: ${perr.message}`,
+        value: undefined,
       },
       { status: 400 },
     );
   }
 
-  return NextResponse.json(planRestaurant.unwrap());
+  return NextResponse.json({
+    error: false,
+    message: "Successfully found plan restaurant",
+    value: planRestaurant.unwrap(),
+  });
 };

@@ -1,4 +1,6 @@
-import PlanModel from "@/models/Plan";
+import PlanModel, { PlanDocument } from "@/models/Plan";
+import { PlanRestaurantDocument } from "@/models/PlanRestaurant";
+import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
 import {
   deletePlan,
@@ -40,13 +42,20 @@ export const DELETE = async function (
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { planId: string } },
-) {
+): Promise<NextResponse<APIResult<PlanRestaurantDocument[]>>> {
   await dbConnect();
 
   const { planId } = await params;
 
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan ID required",
+        value: undefined,
+      },
+      { status: 400 },
+    );
 
   try {
     const plan = await PlanModel.findById(planId);
@@ -98,27 +107,42 @@ export const GET = async function (
 export const PUT = async function (
   req: NextRequest,
   { params }: { params: { planId: string } },
-) {
+): Promise<NextResponse<APIResult<PlanDocument>>> {
   await dbConnect();
 
   const { planId } = await params;
 
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan ID required",
+        value: undefined,
+      },
+      { status: 400 },
+    );
 
   let body: { name?: string } | null = null;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json(
-      { error: true, message: "Plan name required in body" },
+      {
+        error: true,
+        message: "Plan name required in body",
+        value: undefined,
+      },
       { status: 400 },
     );
   }
   const name = body?.name;
   if (!name) {
     return NextResponse.json(
-      { error: true, message: "Plan name required" },
+      {
+        error: true,
+        message: "Plan name required",
+        value: undefined,
+      },
       { status: 400 },
     );
   }
@@ -136,5 +160,9 @@ export const PUT = async function (
     );
   }
 
-  return NextResponse.json(updated.unwrap(), { status: 200 });
+  return NextResponse.json({
+    error: false,
+    message: "Successfully updated plan",
+    value: updated.unwrap(),
+  });
 };
