@@ -145,7 +145,7 @@ export async function getRestaurantsInPlan(
   }
 }
 
-// TODO: PUT plan/[planId]
+// PUT plan/[planId]
 export async function updatePlan(
   planId: string,
   name: string,
@@ -175,7 +175,36 @@ export async function updatePlan(
   }
 }
 
-// TODO: POST plan/[planId]/restaurant/[restaurantId]
+// POST plan/[planId]/restaurant/[restaurantId]
+export async function addRestaurantToPlan(
+  planId: string,
+  restaurantId: string,
+): Promise<Result<PlanRestaurantDocument>> {
+  try {
+    await dbConnect();
+
+    const planRestaurant = await PlanRestaurantModel.create({
+      planId: planId,
+      restaurantId: restaurantId,
+    });
+
+    return new Result<PlanRestaurantDocument>({
+      error: false,
+      message: "Successfully added restaurant to plan.",
+      value: planRestaurant,
+    });
+  } catch (e) {
+    const err = e as { message?: string };
+    return new Result<PlanRestaurantDocument>({
+      error: true,
+      message:
+        err.message != undefined
+          ? err.message
+          : "Failed to add restaurant to plan.",
+      value: undefined,
+    });
+  }
+}
 
 // TODO: DELETE plan/[planId]/restaurant/[restaurantId]
 

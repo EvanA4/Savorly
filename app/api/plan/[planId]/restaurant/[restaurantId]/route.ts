@@ -4,6 +4,7 @@ import { getRestaurantById } from "@/utils/server/restaurant";
 
 import dbConnect from "@/utils/dbconnect";
 import { NextRequest, NextResponse } from "next/server";
+import { addRestaurantToPlan } from "@/utils/server/plan";
 
 // POST (add restaurant to plan)
 export const POST = async function (
@@ -18,9 +19,29 @@ export const POST = async function (
   if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const plan = await PlanModel.findOne({ _id: planId });
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+  try {
+    const plan = await PlanModel.findById(planId);
+    if (!plan) {
+      return NextResponse.json(
+        {
+          error: true,
+          message: "Plan not found",
+          value: undefined,
+        },
+        { status: 404 },
+      );
+    }
+  } catch (e) {
+    const err = e as { message?: string };
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to find plan: ${err.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
   // Check if restaurantId is valid
   if (!restaurantId)
@@ -30,11 +51,13 @@ export const POST = async function (
     );
 
   const restaurant = await getRestaurantById(restaurantId);
-  if (!restaurant)
+  const restExists = restaurant.anticipate();
+  if (restExists.error) {
     return NextResponse.json(
       { message: "Restaurant not found" },
       { status: 404 },
     );
+  }
 
   // Check if restaurant is already in the plan
   const isInPlan = await PlanRestaurantModel.findOne({
@@ -42,19 +65,28 @@ export const POST = async function (
     restaurantId,
   });
 
-  if (isInPlan)
+  if (isInPlan) {
     return NextResponse.json(
       { message: "Restaurant is already in the plan" },
       { status: 400 },
     );
+  }
 
   // Create a new PlanRestaurant document
-  const planRestaurant = await PlanRestaurantModel.create({
-    planId,
-    restaurantId,
-  });
+  const planRestaurant = await addRestaurantToPlan(planId, restaurantId);
+  const perr = planRestaurant.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to add restaurant to plan: ${perr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  return NextResponse.json(planRestaurant, { status: 200 });
+  return NextResponse.json(planRestaurant.unwrap());
 };
 
 // DELETE (remove restaurant from plan)
@@ -90,10 +122,6 @@ export const DELETE = async function (
     );
 
   // Delete the PlanRestaurant document
-  await PlanRestaurantModel.deleteOne({
-    planId,
-    restaurantId,
-  });
 
   return NextResponse.json(
     { message: "Restaurant removed from plan" },
