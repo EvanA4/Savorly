@@ -1,7 +1,7 @@
 // api/restaurant/stats/[poiId]
-// import StatsModel from "@/models/Stats";
 import ReviewModel from "@/models/Review";
 import dbConnect from "@/utils/dbconnect";
+import { getRestaurantById } from "@/utils/server/restaurant";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async function (
@@ -10,9 +10,24 @@ export const GET = async function (
 ) {
   await dbConnect();
 
-  const poiId = params.poiId;
+  // poiId must be valid
+  const { poiId } = await params;
   if (!poiId) {
-    return NextResponse.json({ message: "Poi Id required" }, { status: 400 });
+    return NextResponse.json(
+      { message: "POI ID is required" },
+      { status: 400 },
+    );
+  }
+
+  const isPoi = (await getRestaurantById(poiId as string)) != undefined;
+  if (!isPoi) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "POI ID is invalid",
+      },
+      { status: 400 },
+    );
   }
 
   // get average rating
@@ -37,7 +52,7 @@ export const GET = async function (
       },
     },
   ]);
-  const avgBudget = avg_budget?.avgBudget ?? 0;
+  const avgBudget = Math.round(avg_budget?.avgBudget ?? 0);
 
   // get # reviews
   const reviewCount = await ReviewModel.countDocuments({ restaurantId: poiId });
