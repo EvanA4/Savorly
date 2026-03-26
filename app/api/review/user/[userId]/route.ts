@@ -173,6 +173,7 @@ export const POST = async function (
     title: titleArr[0] as string,
     description: descArr[0] as string,
     rating: rating,
+    budget: budget,
     userId: userId,
     restaurantId: restIdArr[0] as string,
     tags: in_fd.getAll("tags") as string[],

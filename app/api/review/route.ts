@@ -8,7 +8,7 @@ export const GET = async function (
   _: NextRequest,
 ): Promise<NextResponse<APIResult<ReviewDocument[]>>> {
   await dbConnect();
-  const reviews = (await ReviewModel.find()) as ReviewDocument[];
+  const reviews = (await ReviewModel.find().limit(20)) as ReviewDocument[];
   return NextResponse.json({
     error: false,
     message: "Successfully got all reviews",

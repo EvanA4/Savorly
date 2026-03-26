@@ -158,6 +158,7 @@ export async function updateReview(review: {
   title: string;
   description: string;
   rating: number;
+  budget: number;
   tags: string[];
   imagesToCreate: File[];
   imagesToDelete: string[]; // List of _id's
@@ -178,6 +179,7 @@ export async function updateReview(review: {
           title: review.title,
           description: review.description,
           rating: review.rating,
+          budget: review.budget,
         },
         { returnDocument: "after" },
       )) as ReviewDocument;
@@ -281,6 +283,7 @@ export async function createReview(
     title: string;
     description: string;
     rating: number;
+    budget: number;
     tags: string[];
     imagesToCreate: File[];
   },
@@ -361,6 +364,7 @@ export async function createReview(
       userId: userId,
       restaurantId: created.restaurantId,
       rating: created.rating,
+      budget: created.budget,
       description: created.description,
       title: created.title,
       _id: created._id,
