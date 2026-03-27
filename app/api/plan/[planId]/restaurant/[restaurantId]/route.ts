@@ -160,7 +160,11 @@ export const DELETE = async function (
     );
   }
 
-  return NextResponse.json(planRestaurant.unwrap());
+  return NextResponse.json({
+    error: false,
+    message: "Successfully deleted restaurant from plan",
+    value: planRestaurant.unwrap(),
+  });
 };
 
 // GET (Verify if restaurant is in the plan)
