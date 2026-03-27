@@ -5,6 +5,7 @@ import CollectionList from "@/components/profile/collections/CollectionList";
 import { getUserPlans } from "@/utils/client/plan";
 import { useUser } from "@auth0/nextjs-auth0";
 import AddIcon from "@mui/icons-material/Add";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import IconButton from "@mui/material/IconButton";
 import { useEffect, useState } from "react";
 
@@ -44,6 +45,8 @@ export default function CollectionsPage() {
   useEffect(() => {
     if (!isLoading && user) {
       getCollections();
+    } else if (!isLoading && !user) {
+      setCollectionsLoading(false);
     }
   }, [user, isLoading]);
 
@@ -71,6 +74,36 @@ export default function CollectionsPage() {
               </div>
             ))}
           </>
+        ) : !user ? (
+          <div className="flex flex-col items-center justify-center gap-4 mt-16 px-6 text-center">
+            <div className="rounded-2xl p-10 flex flex-col items-center gap-4 w-full max-w-sm md:max-w-md shadow-sm border border-gray-100">
+              <div className="bg-blue-50 rounded-full p-4">
+                <BookmarkBorderIcon className="!text-4xl text-blue-400" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-xl font-semibold text-gray-700">
+                  Save your favorite spots
+                </p>
+                <p className="text-sm text-gray-400">
+                  Sign in or create an account to start building collections.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
+                <a
+                  href="/auth/login"
+                  className="flex-1 text-center px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Sign in
+                </a>
+                <a
+                  href="/auth/login?screen_hint=signup"
+                  className="flex-1 text-center px-4 py-2 border border-gray-300 text-gray-600 text-sm rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  Create account
+                </a>
+              </div>
+            </div>
+          </div>
         ) : (
           collections.map((collection) => (
             <CollectionList
