@@ -3,6 +3,7 @@ import { Result } from "@/types/results";
 import { UserStats } from "@/types/userstats";
 import { getReviewsByUserId } from "./review";
 import dbConnect from "../dbconnect";
+import { getUserPlans } from "./plan";
 
 export async function getAuth0AccessToken(): Promise<string> {
   const rawRes = await fetch(`${process.env.AUTH0_DOMAIN!}/oauth/token`, {
@@ -55,7 +56,17 @@ export async function getUserStatsById(id: string): Promise<Result<UserStats>> {
     const numRestaurants = new Set(reviews.map((x) => x.restaurantId)).size;
 
     // get number of collections by userID [TODO]
-    // code here
+    const plansRes = await getUserPlans(id);
+    const planRerr = plansRes.anticipate();
+    if (planRerr.error) {
+      return new Result<UserStats>({
+        error: true,
+        message: `Failed to get plans for user: ${planRerr.message}`,
+        value: undefined,
+      });
+    }
+    const plans = plansRes.unwrap();
+    const numCollections = plans.length;
 
     return new Result<UserStats>({
       error: false,
@@ -63,7 +74,7 @@ export async function getUserStatsById(id: string): Promise<Result<UserStats>> {
       value: {
         numReviews: reviews.length,
         numRestaurants: numRestaurants,
-        numCollections: 0,
+        numCollections: numCollections,
       },
     });
   } catch (e) {
