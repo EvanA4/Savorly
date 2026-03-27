@@ -26,7 +26,7 @@ function CRUDReviewCard(props: {
         }
       }
     })();
-  }, []);
+  }, [props.review]);
 
   return (
     <div className="min-w-70 w-70 h-fit rounded-xl overflow-hidden shadow-lg relative">
