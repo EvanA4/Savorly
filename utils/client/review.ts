@@ -186,7 +186,7 @@ export function getShortDesc(description: string) {
 }
 
 export function getShortName(name: string) {
-  if (!name) return name;
+  if (!name) return "";
   if (name.includes("@")) {
     return name.split("@")[0];
   }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import Image from "next/image";
 import { ReviewDocument } from "@/models/Review";
 import { getImagesByReviewId } from "@/utils/client/image";
@@ -12,9 +12,13 @@ import {
   getShortName,
 } from "@/utils/client/review";
 
-function ReviewCard(props: { review: ReviewDocument }) {
+function ReviewCard(props: {
+  review: ReviewDocument;
+  username: string | undefined;
+  uidMap: RefObject<Map<string, MAPIUser>>;
+}) {
   const [imageSrc, setImageSrc] = useState("");
-  const [user, setUser] = useState<MAPIUser | undefined>();
+  const [username, setUsername] = useState<string | undefined>(props.username);
 
   useEffect(() => {
     (async () => {
@@ -29,12 +33,15 @@ function ReviewCard(props: { review: ReviewDocument }) {
         }
       }
 
-      const userRes = await getUserById(props.review.userId);
-      if (userRes) {
-        setUser(userRes);
+      if (!username) {
+        const userRes = await getUserById(props.review.userId);
+        if (userRes) {
+          props.uidMap.current.set(props.review.userId, userRes);
+          setUsername(userRes.name);
+        }
       }
     })();
-  }, []);
+  }, [props.review, username]);
 
   return (
     <div className="min-w-70 w-70 h-fit rounded-xl overflow-hidden shadow-lg">
@@ -71,7 +78,7 @@ function ReviewCard(props: { review: ReviewDocument }) {
             </p>
           )}
         </div>
-        {user && <p>{getShortName(user.name)}</p>}
+        {props.username && <p>{username ? getShortName(username) : ""}</p>}
         {/* <p className="text-[14px] text-blue-400">{props.review.name}</p> */}
         <p className="text-[10px] 2xl:text-[12px] 3xl:text-[14px]">
           {getShortDesc(props.review.description)}

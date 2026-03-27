@@ -7,6 +7,16 @@ import { PopulatedReview } from "@/types/review";
 import Image from "next/image";
 import { createReview, updateReview } from "@/utils/client/review";
 import { ReviewDocument } from "@/models/Review";
+import imageCompression from "browser-image-compression";
+
+async function shrinkFile(file: File) {
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  };
+  return await imageCompression(file, options);
+}
 
 function ReviewModal(props: {
   visible: boolean;
@@ -173,7 +183,13 @@ function ReviewModal(props: {
             </div>
           )}
           <FileUploader
-            onUpload={(files) => setImagesInput(files)}
+            onUpload={async (files) => {
+              const compressed: File[] = [];
+              for (let i = 0; i < files.length; ++i) {
+                compressed.push(await shrinkFile(files[i]));
+              }
+              setImagesInput(compressed);
+            }}
             allowedTypes={["png", "jpg", "jpeg", "JPG", "JPEG"]}
             multipleFiles
           />

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import StickyRestSelect from "../forms/StickyRestSelect";
 import Image from "next/image";
 import ReviewCard from "./ReviewCard";
@@ -21,6 +21,8 @@ import {
 import { ReviewDocument } from "@/models/Review";
 import { PopulatedReview } from "@/types/review";
 import ReadReviewModal from "../modals/Review/ReadReviewModal";
+import { MAPIUser } from "@/types/auth0/mapi_user";
+import { getUserById } from "@/utils/client/users";
 
 function RestPage() {
   const { user, isLoading } = useUser();
@@ -46,6 +48,7 @@ function RestPage() {
     undefined,
   );
   const [showRRM, setShowRRM] = useState<boolean>(false);
+  const uidMap = useRef<Map<string, MAPIUser>>(new Map<string, MAPIUser>());
 
   async function fetchRest() {
     const restaurantRes = await getRestaurantById(searchParams.get("id")!);
@@ -78,6 +81,16 @@ function RestPage() {
     if (rerr.error) {
       console.log(rerr.message);
     } else {
+      const tmpReviews = restaurantRes.unwrap();
+      for (let i = 0; i < tmpReviews.length; ++i) {
+        if (!uidMap.current.has(tmpReviews[i].userId)) {
+          const userRes = await getUserById(tmpReviews[i].userId);
+          if (userRes) {
+            uidMap.current.set(tmpReviews[i].userId, userRes);
+          }
+        }
+      }
+
       setReviews(restaurantRes.unwrap());
     }
   }
@@ -187,7 +200,12 @@ function RestPage() {
                     }
                   }}
                 >
-                  <ReviewCard review={val} key={idx} />
+                  <ReviewCard
+                    review={val}
+                    key={idx}
+                    username={uidMap.current.get(val.userId)?.name}
+                    uidMap={uidMap}
+                  />
                 </button>
               ))}
             </div>
