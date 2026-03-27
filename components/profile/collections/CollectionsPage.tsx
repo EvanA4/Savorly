@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import IconButton from "@mui/material/IconButton";
 import { useEffect, useState } from "react";
+import CreateCollectionModal from "./CreateCollectionModal";
 
 export default function CollectionsPage() {
   const { user, isLoading } = useUser();
@@ -15,13 +16,15 @@ export default function CollectionsPage() {
     { name: string; restaurants: string[] }[]
   >([]);
   const [collectionsLoading, setCollectionsLoading] = useState(true);
+  const [showCreateCollectionModal, setShowCreateCollectionModal] =
+    useState(false);
 
-  async function getCollections() {
+  async function getCollections(userId: string) {
     setCollectionsLoading(true);
 
     try {
       // get user's collections
-      const populatedPlansRes = await getUserPlans(user!.sub);
+      const populatedPlansRes = await getUserPlans(userId);
       const rerr = populatedPlansRes.anticipate();
       if (rerr.error) {
         console.log(rerr.message);
@@ -44,7 +47,7 @@ export default function CollectionsPage() {
 
   useEffect(() => {
     if (!isLoading && user?.sub) {
-      getCollections();
+      getCollections(user.sub);
     } else if (!isLoading && !user) {
       setCollectionsLoading(false);
     }
@@ -55,9 +58,20 @@ export default function CollectionsPage() {
       <div className="pt-[60px] border-b-1 border-b-gray-300 flex items-center justify-between">
         <p className=" pl-4 py-4 text-2xl">Collections</p>
         {/* add collection edit modal here? */}
-        <IconButton className="mr-8!">
+        <IconButton
+          className="mr-8!"
+          onClick={() => setShowCreateCollectionModal(true)}
+        >
           <AddIcon fontSize="large" />
         </IconButton>
+
+        {showCreateCollectionModal && user?.sub && (
+          <CreateCollectionModal
+            userId={user.sub}
+            onClose={() => setShowCreateCollectionModal(false)}
+            onCreated={() => getCollections(user.sub!)}
+          />
+        )}
       </div>
       <div className="pt-5 flex flex-col items-center justify-center gap-4 pb-[65px] md:pb-[0px]">
         {isLoading || collectionsLoading ? (

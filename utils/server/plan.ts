@@ -41,31 +41,6 @@ export async function createPlan(
   }
 }
 
-// // GET plan/user/[userId]
-// export async function getUserPlans(
-//   userId: string,
-// ): Promise<Result<PlanDocument[]>> {
-//   try {
-//     await dbConnect();
-//     const plans = (await PlanModel.find({
-//       creatorId: userId,
-//     })) as PlanDocument[];
-//     return new Result<PlanDocument[]>({
-//       error: false,
-//       message: "Successfully retrieved plans.",
-//       value: plans,
-//     });
-//   } catch (e) {
-//     const err = e as { message?: string };
-//     return new Result<PlanDocument[]>({
-//       error: true,
-//       message:
-//         err.message != undefined ? err.message : "Failed to look up plans.",
-//       value: undefined,
-//     });
-//   }
-// }
-
 // GET plan/user/[userId] (gets all plans with their restaurants for a user)
 export async function getUserPlans(
   userId: string,

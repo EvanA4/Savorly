@@ -1,4 +1,3 @@
-import { PlanDocument } from "@/models/Plan";
 import { PopulatedPlan } from "@/types/plan";
 import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
@@ -60,7 +59,11 @@ export const POST = async function (
     );
   }
 
-  return NextResponse.json(plan.unwrap());
+  return NextResponse.json({
+    error: false,
+    message: "Successfully created plan",
+    value: plan.unwrap(),
+  });
 };
 
 // GET (get all of a user's plans as populatedPlans)
