@@ -56,7 +56,7 @@ export default function CollectionsPage() {
 
   return (
     <div className="h-full relative">
-      <div className="pt-[60px] border-b-1 border-b-gray-300 flex items-center justify-between">
+      <div className="pt-15 border-b border-b-gray-300 flex items-center justify-between">
         <p className=" pl-4 py-4 text-2xl">Collections</p>
         {/* add collection edit modal here? */}
         <IconButton
@@ -74,7 +74,7 @@ export default function CollectionsPage() {
           />
         )}
       </div>
-      <div className="pt-5 flex flex-col items-center justify-center gap-4 pb-[65px] md:pb-[0px]">
+      <div className="pt-5 flex flex-col items-center justify-center gap-4 pb-16.25 md:pb-0">
         {isLoading || collectionsLoading ? (
           <>
             {[1, 2, 3].map((i) => (
@@ -93,7 +93,7 @@ export default function CollectionsPage() {
           <div className="flex flex-col items-center justify-center gap-4 mt-16 px-6 text-center">
             <div className="rounded-2xl p-10 flex flex-col items-center gap-4 w-full max-w-sm md:max-w-md shadow-sm border border-gray-100">
               <div className="bg-blue-50 rounded-full p-4">
-                <BookmarkBorderIcon className="!text-4xl text-blue-400" />
+                <BookmarkBorderIcon className="text-4xl! text-blue-400" />
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-xl font-semibold text-gray-700">
@@ -123,8 +123,10 @@ export default function CollectionsPage() {
           collections.map((collection) => (
             <CollectionList
               key={collection.id}
+              planId={collection.id}
               name={collection.name}
               restaurants={collection.restaurants}
+              onDeleted={() => getCollections(user.sub!)}
             />
           ))
         )}

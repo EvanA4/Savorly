@@ -35,7 +35,11 @@ export const DELETE = async function (
     );
   }
 
-  return NextResponse.json(planRes.unwrap());
+  return NextResponse.json({
+    error: false,
+    message: "Successfully deleted plan",
+    value: planRes.unwrap(),
+  });
 };
 
 // GET (get all restaurants in a plan)
