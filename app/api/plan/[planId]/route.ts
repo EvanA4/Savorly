@@ -1,7 +1,12 @@
-import PlanModel from "@/models/Plan";
-import PlanRestaurantModel from "@/models/PlanRestaurant";
-
+import PlanModel, { PlanDocument } from "@/models/Plan";
+import { Restaurant } from "@/types/restaurant";
+import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
+import {
+  deletePlan,
+  getRestaurantsInPlan,
+  updatePlan,
+} from "@/utils/server/plan";
 import { NextRequest, NextResponse } from "next/server";
 
 // DELETE (delete plan)
@@ -17,70 +22,150 @@ export const DELETE = async function (
   if (!planId)
     return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
 
-  const plan = await PlanModel.findOneAndDelete({
-    _id: planId,
+  const planRes = await deletePlan(planId);
+  const perr = planRes.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to delete plan: ${perr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
+
+  return NextResponse.json({
+    error: false,
+    message: "Successfully deleted plan",
+    value: planRes.unwrap(),
   });
-
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
-
-  // delete all planRestaurants associated with the plan
-  await PlanRestaurantModel.deleteMany({ planId: planId });
-
-  return NextResponse.json(plan, { status: 200 });
 };
 
 // GET (get all restaurants in a plan)
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { planId: string } },
-) {
+): Promise<NextResponse<APIResult<Restaurant[]>>> {
   await dbConnect();
 
   const { planId } = await params;
 
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan ID required",
+        value: undefined,
+      },
+      { status: 400 },
+    );
 
-  const plan = await PlanModel.find({ _id: planId });
-
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+  try {
+    const plan = await PlanModel.findById(planId);
+    if (!plan) {
+      return NextResponse.json(
+        {
+          error: true,
+          message: "Plan not found",
+          value: undefined,
+        },
+        { status: 404 },
+      );
+    }
+  } catch (e) {
+    const err = e as { message?: string };
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to get plan: ${err.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
   // get all restaurants in the plan
-  const restaurants = await PlanRestaurantModel.find({ planId: planId });
+  const restaurants = await getRestaurantsInPlan(planId);
+  const rerr = restaurants.anticipate();
+  if (rerr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to get restaurants in plan: ${rerr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  return NextResponse.json({ plan, restaurants }, { status: 200 });
+  return NextResponse.json({
+    error: false,
+    message: "Successfully retrieved planRestaurants.",
+    value: restaurants.unwrap(),
+  });
 };
 
 // PUT (update plan name)
 export const PUT = async function (
   req: NextRequest,
   { params }: { params: { planId: string } },
-) {
+): Promise<NextResponse<APIResult<PlanDocument>>> {
   await dbConnect();
 
   const { planId } = await params;
 
   if (!planId)
-    return NextResponse.json({ message: "Plan ID required" }, { status: 400 });
-
-  const body = await req.json();
-  const name = body.name;
-  if (!name)
     return NextResponse.json(
-      { message: "Plan name required" },
+      {
+        error: true,
+        message: "Plan ID required",
+        value: undefined,
+      },
       { status: 400 },
     );
 
-  const plan = await PlanModel.findOneAndUpdate(
-    { _id: planId },
-    { name },
-    { new: true },
-  );
+  let body: { name?: string } | null = null;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan name required in body",
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
+  const name = body?.name;
+  if (!name) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Plan name required",
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  if (!plan)
-    return NextResponse.json({ message: "Plan not found" }, { status: 404 });
+  const updated = await updatePlan(planId, name);
+  const perr = updated.anticipate();
+  if (perr.error) {
+    return NextResponse.json(
+      {
+        error: true,
+        message: `Failed to update plan: ${perr.message}`,
+        value: undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  return NextResponse.json(plan, { status: 200 });
+  return NextResponse.json({
+    error: false,
+    message: "Successfully updated plan",
+    value: updated.unwrap(),
+  });
 };
