@@ -1,5 +1,6 @@
 import { PlanDocument } from "@/models/Plan";
 import { PlanRestaurantDocument } from "@/models/PlanRestaurant";
+import { PopulatedPlan } from "@/types/plan";
 import { Restaurant } from "@/types/restaurant";
 import { Result } from "@/types/results";
 
@@ -18,9 +19,9 @@ export async function createPlan(
 
 export async function getUserPlans(
   userId: string,
-): Promise<Result<PlanDocument[]>> {
+): Promise<Result<PopulatedPlan[]>> {
   const rawRes = await fetch(`/api/plan/user/${userId}`);
-  return new Result<PlanDocument[]>(await rawRes.json());
+  return new Result<PopulatedPlan[]>(await rawRes.json());
 }
 
 export async function deletePlan(

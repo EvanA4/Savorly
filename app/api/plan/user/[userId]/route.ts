@@ -1,4 +1,5 @@
 import { PlanDocument } from "@/models/Plan";
+import { PopulatedPlan } from "@/types/plan";
 import { APIResult } from "@/types/results";
 import dbConnect from "@/utils/dbconnect";
 import { createPlan, getUserPlans } from "@/utils/server/plan";
@@ -62,11 +63,11 @@ export const POST = async function (
   return NextResponse.json(plan.unwrap());
 };
 
-// GET (get all of a user's plans)
+// GET (get all of a user's plans as populatedPlans)
 export const GET = async function (
   req: NextRequest,
   { params }: { params: { userId: string } },
-): Promise<NextResponse<APIResult<PlanDocument[]>>> {
+): Promise<NextResponse<APIResult<PopulatedPlan[]>>> {
   await dbConnect();
 
   const { userId } = await params;

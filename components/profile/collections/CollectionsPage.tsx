@@ -2,7 +2,7 @@
 
 import Nav from "@/components/general/Nav";
 import CollectionList from "@/components/profile/collections/CollectionList";
-import { getRestaurantsInPlan, getUserPlans } from "@/utils/client/plan";
+import { getUserPlans } from "@/utils/client/plan";
 import { useUser } from "@auth0/nextjs-auth0";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
@@ -20,29 +20,18 @@ export default function CollectionsPage() {
 
     try {
       // get user's collections
-      const plansRes = await getUserPlans(user!.sub);
-      const rerr = plansRes.anticipate();
+      const populatedPlansRes = await getUserPlans(user!.sub);
+      const rerr = populatedPlansRes.anticipate();
       if (rerr.error) {
         console.log(rerr.message);
       }
 
-      // get all restaurants in user's collections
-      const collectionsWithRestaurants = await Promise.all(
-        plansRes.unwrap().map(async (plan) => {
-          const restaurantsRes = await getRestaurantsInPlan(
-            plan._id.toString(),
-          );
-          const restaurantsErr = restaurantsRes.anticipate();
-          if (restaurantsErr.error) {
-            console.error(restaurantsErr.message);
-            return { name: plan.name, restaurants: [] };
-          }
-          return {
-            name: plan.name,
-            restaurants: restaurantsRes.unwrap().map((r) => r.name),
-          };
-        }),
-      );
+      const collectionsWithRestaurants = populatedPlansRes
+        .unwrap()
+        .map((plan) => ({
+          name: plan.name,
+          restaurants: plan.restaurants.map((r) => r.name),
+        }));
 
       setCollections(collectionsWithRestaurants);
     } catch (e) {

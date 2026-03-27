@@ -8,6 +8,7 @@ import dbConnect from "../dbconnect";
 import { startSession } from "mongoose";
 import { Restaurant } from "@/types/restaurant";
 import { getRestaurantById } from "./restaurant";
+import { PopulatedPlan } from "@/types/plan";
 
 // POST plan/user/[userId]
 export async function createPlan(
@@ -40,26 +41,90 @@ export async function createPlan(
   }
 }
 
-// GET plan/user/[userId]
+// // GET plan/user/[userId]
+// export async function getUserPlans(
+//   userId: string,
+// ): Promise<Result<PlanDocument[]>> {
+//   try {
+//     await dbConnect();
+//     const plans = (await PlanModel.find({
+//       creatorId: userId,
+//     })) as PlanDocument[];
+//     return new Result<PlanDocument[]>({
+//       error: false,
+//       message: "Successfully retrieved plans.",
+//       value: plans,
+//     });
+//   } catch (e) {
+//     const err = e as { message?: string };
+//     return new Result<PlanDocument[]>({
+//       error: true,
+//       message:
+//         err.message != undefined ? err.message : "Failed to look up plans.",
+//       value: undefined,
+//     });
+//   }
+// }
+
+// GET plan/user/[userId] (gets all plans with their restaurants for a user)
 export async function getUserPlans(
   userId: string,
-): Promise<Result<PlanDocument[]>> {
+): Promise<Result<PopulatedPlan[]>> {
   try {
     await dbConnect();
+
+    // Get all plans for yser
     const plans = (await PlanModel.find({
       creatorId: userId,
     })) as PlanDocument[];
-    return new Result<PlanDocument[]>({
+
+    // Get all planRestaurants for ALL plans (avoid duplicate fetches)
+    const planIds = plans.map((p) => p._id);
+    const allPlanRestaurants = (await PlanRestaurantModel.find({
+      planId: { $in: planIds as unknown as string[] },
+    })) as PlanRestaurantDocument[];
+
+    // Fetch all unique restaurants in parallel (avoid duplicate fetches)
+    const uniqueRestaurantIds = [
+      ...new Set(allPlanRestaurants.map((pr) => pr.restaurantId)),
+    ];
+    const restaurantResults = (await Promise.all(
+      uniqueRestaurantIds.map((id) => getRestaurantById(id)),
+    )) as Result<Restaurant>[];
+
+    // Build a map for quick lookup
+    const restaurantMap = new Map<string, Restaurant>();
+    restaurantResults.forEach((result, i) => {
+      if (!result.anticipate().error) {
+        restaurantMap.set(uniqueRestaurantIds[i], result.unwrap());
+      }
+    });
+
+    // Assemble populated plans
+    const populatedPlans = plans.map((plan) => {
+      const planRestaurants = allPlanRestaurants
+        .filter((pr) => pr.planId.toString() === plan._id.toString())
+        .map((pr) => restaurantMap.get(pr.restaurantId))
+        .filter(Boolean) as Restaurant[];
+
+      return {
+        name: plan.name,
+        creatorId: userId,
+        planId: plan._id.toString(),
+        restaurants: planRestaurants,
+      };
+    });
+
+    return new Result<PopulatedPlan[]>({
       error: false,
-      message: "Successfully retrieved plans.",
-      value: plans,
+      message: "Successfully retrieved collections.",
+      value: populatedPlans,
     });
   } catch (e) {
     const err = e as { message?: string };
-    return new Result<PlanDocument[]>({
+    return new Result<PopulatedPlan[]>({
       error: true,
-      message:
-        err.message != undefined ? err.message : "Failed to look up plans.",
+      message: err.message ?? "Failed to retrieve collections.",
       value: undefined,
     });
   }
