@@ -43,7 +43,7 @@ export default function CollectionsPage() {
   }
 
   useEffect(() => {
-    if (!isLoading && user) {
+    if (!isLoading && user?.sub) {
       getCollections();
     } else if (!isLoading && !user) {
       setCollectionsLoading(false);
