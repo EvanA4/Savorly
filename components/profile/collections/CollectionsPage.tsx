@@ -123,15 +123,18 @@ export default function CollectionsPage() {
             </div>
           </div>
         ) : (
-          collections.map((collection) => (
-            <CollectionList
-              key={collection.id}
-              planId={collection.id}
-              name={collection.name}
-              restaurants={collection.restaurants}
-              onDeleted={() => getCollections(user.sub!)}
-            />
-          ))
+          collections.map((collection) => {
+            const userId = user.sub!;
+            return (
+              <CollectionList
+                key={collection.id}
+                planId={collection.id}
+                name={collection.name}
+                restaurants={collection.restaurants}
+                onDeleted={() => getCollections(userId)}
+              />
+            );
+          })
         )}
       </div>
 

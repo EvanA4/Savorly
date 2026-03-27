@@ -144,7 +144,10 @@ export default function CollectionList({
                     </IconButton>
                   )}
                   <div className="flex-1">
-                    <CollectionItem RestaurantName={rest.name} />
+                    <CollectionItem
+                      RestaurantId={rest.id}
+                      RestaurantName={rest.name}
+                    />
                   </div>
                 </div>
               ))
