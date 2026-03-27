@@ -2,11 +2,41 @@
 import { useUser } from "@auth0/nextjs-auth0";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+
+const LINK_DATA = [
+  {
+    pathname: "/",
+    displayStr: "Home",
+  },
+  {
+    pathname: "/collections",
+    displayStr: "Collections",
+  },
+  {
+    pathname: "/friends",
+    displayStr: "Friends",
+  },
+  {
+    pathname: "/posts",
+    displayStr: "Posts",
+  },
+];
+
+const NOT_PAGE_STYLE =
+  "hidden md:flex hover:bg-neutral-200 transition-colors " +
+  "duration-200 pt-[2px] border-b-2 border-b-neutral-100 hover:border-b-blue-500 " +
+  "items-center px-3 z-20";
+const IS_PAGE_STYLE =
+  "hidden md:flex hover:bg-neutral-200 transition-colors " +
+  "duration-200 pt-[2px] border-b-2 border-b-blue-500 " +
+  "items-center px-3 z-20";
 
 function TopNav() {
   const { user, isLoading } = useUser();
   const [showSignIn, setShowSignIn] = useState(false);
+  const pathname = usePathname();
 
   const divRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -52,30 +82,17 @@ function TopNav() {
           />
         </Link>
         <div className="flex md:px-10 h-full">
-          <Link
-            href={"/"}
-            className="hidden md:flex hover:bg-neutral-200 transition-colors duration-200 pt-[2px] border-b-2 border-b-neutral-100 hover:border-b-blue-500 items-center px-3 z-20"
-          >
-            Home
-          </Link>
-          <Link
-            href={"/collections"}
-            className="hidden md:flex hover:bg-neutral-200 transition-colors duration-200 pt-[2px] border-b-2 border-b-neutral-100 hover:border-b-blue-500 items-center px-3 z-20"
-          >
-            Collections
-          </Link>
-          <Link
-            href={"/friends"}
-            className="hidden md:flex hover:bg-neutral-200 transition-colors duration-200 pt-[2px] border-b-2 border-b-neutral-100 hover:border-b-blue-500 items-center px-3 z-20"
-          >
-            Friends
-          </Link>
-          <Link
-            href={"/posts"}
-            className="hidden md:flex hover:bg-neutral-200 transition-colors duration-200 pt-[2px] border-b-2 border-b-neutral-100 hover:border-b-blue-500 items-center px-3 z-20"
-          >
-            Posts
-          </Link>
+          {LINK_DATA.map((val, idx) => (
+            <Link
+              href={val.pathname}
+              className={
+                pathname == val.pathname ? IS_PAGE_STYLE : NOT_PAGE_STYLE
+              }
+              key={idx}
+            >
+              {val.displayStr}
+            </Link>
+          ))}
 
           <div className="relative h-full">
             <button

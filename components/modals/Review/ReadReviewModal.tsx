@@ -13,6 +13,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
+import { getShortName } from "@/utils/client/review";
 
 function ReadReviewModal(props: {
   visible: boolean;
@@ -40,7 +41,7 @@ function ReadReviewModal(props: {
     <Modal visible={props.visible} setVisibile={props.setVisible} centered>
       <div className="w-[95vw] md:w-[80vw] 3xl:w-[50vw] max-h-[90vh] overflow-scroll bg-white shadow-xl rounded-xl border border-neutral-300 py-5 flex flex-col overflow-x-hidden">
         {user && (
-          <div className="flex gap-3 px-5">
+          <div className="flex gap-3 px-5 items-center">
             {user && user.picture ? (
               <Image
                 src={user.picture ?? ""}
@@ -60,10 +61,7 @@ function ReadReviewModal(props: {
                 className="h-full w-auto object-contain rounded-full opacity-70"
               />
             )}
-            <div>
-              <p>{user.name}</p>
-              <p className="text-neutral-500">{user.email}</p>
-            </div>
+            <p className="text-lg">{getShortName(user.name)}</p>
           </div>
         )}
         <div className="mt-2 px-5">

@@ -12,6 +12,7 @@ import {
   getRestaurantStatsById,
 } from "@/utils/client/restaurant";
 import Link from "next/link";
+
 import {
   getBudgetStr,
   getPopulatedReview,
@@ -155,7 +156,10 @@ function RestPage() {
                   <span className="text-black hover:underline w-fit">
                     {rest.website == "..."
                       ? "..."
-                      : new URL(rest.website).hostname}
+                      : new URL(rest.website).hostname.length > 20
+                        ? new URL(rest.website).hostname.substring(0, 20) +
+                          "..."
+                        : new URL(rest.website).hostname}
                   </span>
                 </div>
               </a>

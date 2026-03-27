@@ -169,8 +169,26 @@ export async function getReviewsBySearchStr(
 
 export function getBudgetStr(budget: number) {
   // assumes budget is an int in range [1, 3]
-  if (budget == 0) return "";
+  if (!budget) return "";
   else if (budget == 1) return "$";
   else if (budget == 2) return "$$";
   else return "$$$";
+}
+
+export function getShortDesc(description: string) {
+  if (!description) return description;
+  const LIMIT = 94;
+  if (description.length < LIMIT) {
+    return description;
+  } else {
+    return description.slice(0, LIMIT) + "...";
+  }
+}
+
+export function getShortName(name: string) {
+  if (!name) return name;
+  if (name.includes("@")) {
+    return name.split("@")[0];
+  }
+  return name;
 }

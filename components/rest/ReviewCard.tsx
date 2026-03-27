@@ -6,7 +6,11 @@ import { getImagesByReviewId } from "@/utils/client/image";
 import Rating from "./Rating";
 import { MAPIUser } from "@/types/auth0/mapi_user";
 import { getUserById } from "@/utils/client/users";
-import { getBudgetStr } from "@/utils/client/review";
+import {
+  getBudgetStr,
+  getShortDesc,
+  getShortName,
+} from "@/utils/client/review";
 
 function ReviewCard(props: { review: ReviewDocument }) {
   const [imageSrc, setImageSrc] = useState("");
@@ -67,10 +71,10 @@ function ReviewCard(props: { review: ReviewDocument }) {
             </p>
           )}
         </div>
-        {user && <p>{user.name}</p>}
+        {user && <p>{getShortName(user.name)}</p>}
         {/* <p className="text-[14px] text-blue-400">{props.review.name}</p> */}
         <p className="text-[10px] 2xl:text-[12px] 3xl:text-[14px]">
-          {props.review.description}
+          {getShortDesc(props.review.description)}
         </p>
       </div>
     </div>
