@@ -96,7 +96,11 @@ export const POST = async function (
     );
   }
 
-  return NextResponse.json(planRestaurant.unwrap());
+  return NextResponse.json({
+    error: false,
+    message: "Successfully added restaurant to plan",
+    value: planRestaurant.unwrap(),
+  });
 };
 
 // DELETE (remove restaurant from plan)
