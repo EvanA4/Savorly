@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import StickyRestSelect from "../forms/StickyRestSelect";
 import Image from "next/image";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import ReviewCard from "./ReviewCard";
 import Rating from "./Rating";
 import { useUser } from "@auth0/nextjs-auth0";
@@ -23,6 +25,7 @@ import { PopulatedReview } from "@/types/review";
 import ReadReviewModal from "../modals/Review/ReadReviewModal";
 import { MAPIUser } from "@/types/auth0/mapi_user";
 import { getUserById } from "@/utils/client/users";
+import AddToCollectionModal from "./AddToCollectionModal";
 
 function RestPage() {
   const { user, isLoading } = useUser();
@@ -47,6 +50,7 @@ function RestPage() {
   const [selReview, setSelReview] = useState<PopulatedReview | undefined>(
     undefined,
   );
+  const [showAddToCollection, setShowAddToCollection] = useState(false);
   const [showRRM, setShowRRM] = useState<boolean>(false);
   const uidMap = useRef<Map<string, MAPIUser>>(new Map<string, MAPIUser>());
 
@@ -125,19 +129,34 @@ function RestPage() {
           </div>
         </div>
         {user && (
-          <Link
-            className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
-            href={`/posts?restaurantId=${searchParams.get("id")!}`}
-          >
-            <p className="hidden xl:block">Manage Reviews</p>
-            <Image
-              src="/svgs/bplus.svg"
-              width={20}
-              height={20}
-              alt="manage reviews"
-              className="block xl:hidden opacity-50"
-            />
-          </Link>
+          <div className="flex gap-2 items-center">
+            <Link
+              className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
+              href={`/posts?restaurantId=${searchParams.get("id")!}`}
+            >
+              <p className="hidden xl:block">Manage Reviews</p>
+              <span className="block xl:hidden">
+                <RateReviewOutlinedIcon
+                  fontSize="medium"
+                  className="opacity-50"
+                  titleAccess="Manage Reviews"
+                />
+              </span>
+            </Link>
+            <button
+              className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
+              onClick={() => setShowAddToCollection(true)}
+            >
+              <p className="hidden xl:block">Add to Collection</p>
+              <span className="block xl:hidden">
+                <BookmarkBorderIcon
+                  fontSize="medium"
+                  className="opacity-50"
+                  titleAccess="Add to Collection"
+                />
+              </span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -226,6 +245,13 @@ function RestPage() {
           visible={showRRM}
           setVisible={setShowRRM}
           review={selReview}
+        />
+      )}
+      {showAddToCollection && user?.sub && (
+        <AddToCollectionModal
+          userId={user.sub}
+          restaurantId={searchParams.get("id")!}
+          onClose={() => setShowAddToCollection(false)}
         />
       )}
     </div>
