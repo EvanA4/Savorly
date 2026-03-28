@@ -1,4 +1,5 @@
 "use client";
+import ReadReviewModal from "@/components/modals/Review/ReadReviewModal";
 import CRUDReviewCard from "@/components/profile/posts/CRUDReviewCard";
 import { ReviewDocument } from "@/models/Review";
 import { Restaurant } from "@/types/restaurant";
@@ -12,7 +13,7 @@ import {
 import { User } from "@auth0/nextjs-auth0/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 function PostList(props: {
   reviews: ReviewDocument[];
@@ -39,6 +40,11 @@ function PostList(props: {
     rest,
     setRest,
   } = props;
+
+  const [selReview, setSelReview] = useState<PopulatedReview | undefined>(
+    undefined,
+  );
+  const [showRRM, setShowRRM] = useState<boolean>(false);
 
   async function refreshPosts() {
     const spget = searchParams.get("restaurantId");
@@ -105,8 +111,18 @@ function PostList(props: {
           key={idx}
           onDelete={handleDelete}
           onEdit={handleEdit}
+          setSelReview={setSelReview}
+          setShowRRM={setShowRRM}
         />
       ))}
+
+      {selReview && (
+        <ReadReviewModal
+          visible={showRRM}
+          setVisible={setShowRRM}
+          review={selReview}
+        />
+      )}
     </div>
   ) : (
     <p className="text-center text-neutral-700">

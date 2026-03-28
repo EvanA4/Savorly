@@ -4,12 +4,21 @@ import Rating from "../../rest/Rating";
 import Image from "next/image";
 import { ReviewDocument } from "@/models/Review";
 import { getImagesByReviewId } from "@/utils/client/image";
-import { getBudgetStr, getShortDesc } from "@/utils/client/review";
+import {
+  getBudgetStr,
+  getPopulatedReview,
+  getShortDesc,
+} from "@/utils/client/review";
+import { PopulatedReview } from "@/types/review";
 
 function CRUDReviewCard(props: {
   review: ReviewDocument;
   onEdit: (review: ReviewDocument) => void;
   onDelete: (review: ReviewDocument) => void;
+  setSelReview: React.Dispatch<
+    React.SetStateAction<PopulatedReview | undefined>
+  >;
+  setShowRRM: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [imageSrc, setImageSrc] = useState("");
 
@@ -54,7 +63,21 @@ function CRUDReviewCard(props: {
         </div>
       )}
       <div className="w-full h-62.5 bg-white bottom-0 left-0 text-neutral-600 p-5 flex flex-col gap-3">
-        <b className="text-black">{props.review.title}</b>
+        <button
+          className="cursor-pointer text-start"
+          onClick={async () => {
+            const prRes = await getPopulatedReview(props.review._id.toString());
+            const rerr = prRes.anticipate();
+            if (rerr.error) {
+              console.log(`Error: failed to open review: ${rerr.message}`);
+            } else {
+              props.setSelReview(prRes.unwrap());
+              props.setShowRRM(true);
+            }
+          }}
+        >
+          <b className="text-black">{props.review.title}</b>
+        </button>
         <div className="flex items-center gap-3">
           <Rating value={props.review.rating} />
           {props.review.budget && (
