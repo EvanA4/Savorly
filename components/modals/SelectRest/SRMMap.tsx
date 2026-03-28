@@ -110,17 +110,19 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
           </button>
         </div>
         <div className="w-[35%] flex flex-col gap-3">
-          <SingleSelectDD
-            options={cuisines}
-            selected={selCuisine}
-            setSelected={setSelCuisine}
-          />
-          <MultiSelectDD
+          <div className="shadow-md z-[402]">
+            <SingleSelectDD
+              options={cuisines}
+              selected={selCuisine}
+              setSelected={setSelCuisine}
+            />
+          </div>
+          {/* <MultiSelectDD
             options={restrictions}
             selected={selRestricts}
             setSelected={setSelRestricts}
             formatStr="%d restriction(s)"
-          />
+          /> */}
         </div>
       </div>
 
