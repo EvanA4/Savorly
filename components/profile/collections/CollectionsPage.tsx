@@ -122,6 +122,25 @@ export default function CollectionsPage() {
               </div>
             </div>
           </div>
+        ) : collections.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-4 mt-16 px-6 text-center">
+            <div
+              className="rounded-2xl p-10 flex flex-col items-center gap-4 w-full max-w-sm md:max-w-md shadow-sm border border-gray-100"
+              onClick={() => setShowCreateCollectionModal(true)}
+            >
+              <div className="bg-blue-50 rounded-full p-4">
+                <BookmarkBorderIcon className="text-4xl! text-blue-400" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-xl font-semibold text-gray-700">
+                  No collections yet!
+                </p>
+                <p className="text-lg text-gray-400">
+                  Hit the + to start saving your favorite spots!
+                </p>
+              </div>
+            </div>
+          </div>
         ) : (
           collections.map((collection) => {
             const userId = user.sub!;

@@ -125,7 +125,7 @@ export default function CollectionList({
                   <p className="text-sm">
                     This collection is looking a little hungry...
                   </p>
-                  <p className="text-sm">Explore restaurants to get started!</p>
+                  <p className="text-sm">Add restaurants to get started!</p>
                 </div>
               </Link>
             ) : (
