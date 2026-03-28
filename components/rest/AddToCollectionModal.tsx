@@ -121,7 +121,7 @@ export default function AddToCollectionModal({
               >
                 <span>{plan.name}</span>
                 {plan.hasRestaurant && (
-                  <CheckIcon fontSize="small" className="!text-green-400" />
+                  <CheckIcon fontSize="small" className="text-green-400!" />
                 )}
               </button>
             ))}
