@@ -8,6 +8,8 @@ import Image from "next/image";
 import { createReview, updateReview } from "@/utils/client/review";
 import { ReviewDocument } from "@/models/Review";
 import imageCompression from "browser-image-compression";
+import BudgetSelect from "./BudgetSelect";
+import RatingSelect from "./RatingSelect";
 
 async function shrinkFile(file: File) {
   const options = {
@@ -30,8 +32,8 @@ function ReviewModal(props: {
   const [tags, setTags] = useState<string[]>([]);
   const [titleInput, setTitleInput] = useState<string>("");
   const [descInput, setDescInput] = useState<string>("");
-  const [ratingInput, setRatingInput] = useState<number>(0);
-  const [budgetInput, setBudgetInput] = useState<number>(0);
+  const [ratingInput, setRatingInput] = useState<number>(2.5);
+  const [budgetInput, setBudgetInput] = useState<number>(2);
   const [imagesInput, setImagesInput] = useState<File[]>([]);
   const [prevImagesInput, setPrevImagesInput] = useState<boolean[]>([]);
 
@@ -133,19 +135,13 @@ function ReviewModal(props: {
           onChange={(e) => setDescInput(e.target.value)}
           value={descInput}
         />
-        <input
-          type="number"
-          className="bg-white shadow-md p-3 w-full rounded-lg border border-neutral-300"
-          placeholder="Rating"
-          onChange={(e) => setRatingInput(parseFloat(e.target.value))}
-          value={ratingInput}
+        <RatingSelect
+          ratingInput={ratingInput}
+          setRatingInput={setRatingInput}
         />
-        <input
-          type="number"
-          className="bg-white shadow-md p-3 w-full rounded-lg border border-neutral-300"
-          placeholder="Budget"
-          onChange={(e) => setBudgetInput(parseFloat(e.target.value))}
-          value={budgetInput}
+        <BudgetSelect
+          budgetInput={budgetInput}
+          setBudgetInput={setBudgetInput}
         />
         <TagSelect tags={tags} setTags={setTags} />
 
