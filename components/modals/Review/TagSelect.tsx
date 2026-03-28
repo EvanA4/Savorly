@@ -72,7 +72,11 @@ function TagSelect(props: {
           <button
             key={idx}
             className="bg-white hover:bg-neutral-100 px-3 py-1 block w-full cursor-pointer"
-            onClick={() => props.setTags((prev) => [...prev, val])}
+            onClick={() => {
+              if (!props.tags.includes(val) && props.tags.length < 5) {
+                props.setTags((prev) => [...prev, val]);
+              }
+            }}
           >
             {val}
           </button>

@@ -41,7 +41,7 @@ function RatingSelect(props: {
                 className="w-[50%] h-full absolute top-0 left-0"
                 onMouseEnter={() => setHighlight(val - 0.5)}
                 onClick={() => {
-                  console.log(`Setting rating to ${val - 0.5}`);
+                  // console.log(`Setting rating to ${val - 0.5}`);
                   props.setRatingInput(val - 0.5);
                 }}
               ></button>
@@ -49,7 +49,7 @@ function RatingSelect(props: {
                 className="w-[50%] h-full absolute top-0 left-[50%]"
                 onMouseEnter={() => setHighlight(val)}
                 onClick={() => {
-                  console.log(`Setting rating to ${val}`);
+                  // console.log(`Setting rating to ${val}`);
                   props.setRatingInput(val);
                 }}
               ></button>
