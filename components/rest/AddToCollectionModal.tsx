@@ -1,9 +1,9 @@
-// components/modals/AddToCollectionModal.tsx
 "use client";
 
 import { getUserPlans, addRestaurantToPlan } from "@/utils/client/plan";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
+import CheckIcon from "@mui/icons-material/Check";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -18,7 +18,9 @@ export default function AddToCollectionModal({
   restaurantId,
   onClose,
 }: AddToCollectionModalProps) {
-  const [plans, setPlans] = useState<{ id: string; name: string }[]>([]);
+  const [plans, setPlans] = useState<
+    { id: string; name: string; hasRestaurant: boolean }[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
@@ -28,12 +30,20 @@ export default function AddToCollectionModal({
     async function fetchPlans() {
       const res = await getUserPlans(userId);
       if (!res.anticipate().error) {
-        setPlans(res.unwrap().map((p) => ({ id: p.planId, name: p.name })));
+        setPlans(
+          res.unwrap().map((p) => ({
+            id: p.planId,
+            name: p.name,
+            hasRestaurant: p.restaurants.some(
+              (r) => r.mapboxId === restaurantId,
+            ),
+          })),
+        );
       }
       setLoading(false);
     }
     fetchPlans();
-  }, [userId]);
+  }, [userId, restaurantId]);
 
   async function handleAdd(planId: string) {
     setAdding(true);
@@ -45,6 +55,11 @@ export default function AddToCollectionModal({
         setError(res.anticipate().message ?? "Failed to add to collection.");
       } else {
         setSuccess("Added successfully!");
+        setPlans((prev) =>
+          prev.map((p) =>
+            p.id === planId ? { ...p, hasRestaurant: true } : p,
+          ),
+        );
       }
     } catch {
       setError("Something went wrong.");
@@ -95,11 +110,19 @@ export default function AddToCollectionModal({
             {plans.map((plan) => (
               <button
                 key={plan.id}
-                disabled={adding}
-                onClick={() => handleAdd(plan.id)}
-                className="w-full text-left px-4 py-3 border border-gray-100 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-sm text-gray-700 disabled:opacity-50"
+                disabled={adding || plan.hasRestaurant}
+                onClick={() => !plan.hasRestaurant && handleAdd(plan.id)}
+                className={`w-full text-left px-4 py-3 border rounded-lg transition-all text-sm flex items-center justify-between
+                  ${
+                    plan.hasRestaurant
+                      ? "border-green-200 bg-green-50 text-gray-400 cursor-default"
+                      : "border-gray-100 hover:bg-gray-50 hover:border-gray-300 text-gray-700"
+                  } disabled:opacity-70`}
               >
-                {plan.name}
+                <span>{plan.name}</span>
+                {plan.hasRestaurant && (
+                  <CheckIcon fontSize="small" className="!text-green-400" />
+                )}
               </button>
             ))}
           </div>
