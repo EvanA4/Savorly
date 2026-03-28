@@ -13,7 +13,11 @@ import CreateCollectionModal from "./CreateCollectionModal";
 export default function CollectionsPage() {
   const { user, isLoading } = useUser();
   const [collections, setCollections] = useState<
-    { id: string; name: string; restaurants: { id: string; name: string }[] }[]
+    {
+      id: string;
+      name: string;
+      restaurants: { id: string; name: string; avgRating: number }[];
+    }[]
   >([]);
   const [collectionsLoading, setCollectionsLoading] = useState(true);
   const [showCreateCollectionModal, setShowCreateCollectionModal] =
@@ -38,6 +42,7 @@ export default function CollectionsPage() {
           restaurants: plan.restaurants.map((r) => ({
             id: r.mapboxId,
             name: r.name,
+            avgRating: r.avgRating,
           })),
         }));
 

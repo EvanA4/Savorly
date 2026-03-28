@@ -20,7 +20,7 @@ import {
 type CollectionListProps = {
   planId: string;
   name: string;
-  restaurants: { id: string; name: string }[];
+  restaurants: { id: string; name: string; avgRating: number }[];
   onDeleted: () => void;
 };
 
@@ -147,6 +147,7 @@ export default function CollectionList({
                     <CollectionItem
                       RestaurantId={rest.id}
                       RestaurantName={rest.name}
+                      RestaurantRating={rest.avgRating}
                     />
                   </div>
                 </div>
