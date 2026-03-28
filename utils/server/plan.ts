@@ -9,6 +9,7 @@ import { startSession } from "mongoose";
 import { Restaurant } from "@/types/restaurant";
 import { getRestaurantById } from "./restaurant";
 import { PopulatedPlan } from "@/types/plan";
+import ReviewModel from "@/models/Review";
 
 // POST plan/user/[userId]
 export async function createPlan(
@@ -75,12 +76,36 @@ export async function getUserPlans(
       }
     });
 
+    // Get avg ratings for all restaurants in one aggregation
+    const ratingsAgg = await ReviewModel.aggregate<{
+      _id: string;
+      avgRating: number;
+    }>([
+      { $match: { restaurantId: { $in: uniqueRestaurantIds } } },
+      {
+        $group: {
+          _id: "$restaurantId",
+          avgRating: { $avg: "$rating" },
+        },
+      },
+    ]);
+
+    const ratingsMap = new Map<string, number>();
+    ratingsAgg.forEach((r) => ratingsMap.set(r._id, r.avgRating));
+
     // Assemble populated plans
     const populatedPlans = plans.map((plan) => {
       const planRestaurants = allPlanRestaurants
         .filter((pr) => pr.planId.toString() === plan._id.toString())
-        .map((pr) => restaurantMap.get(pr.restaurantId))
-        .filter(Boolean) as Restaurant[];
+        .map((pr) => {
+          const restaurant = restaurantMap.get(pr.restaurantId);
+          if (!restaurant) return undefined;
+          return {
+            ...restaurant,
+            avgRating: ratingsMap.get(pr.restaurantId) ?? 0,
+          };
+        })
+        .filter(Boolean) as (Restaurant & { avgRating: number })[];
 
       return {
         name: plan.name,

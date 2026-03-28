@@ -1,4 +1,3 @@
-// components/profile/collections/CreateCollectionModal.tsx
 "use client";
 
 import { createPlan } from "@/utils/client/plan";

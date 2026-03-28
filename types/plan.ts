@@ -9,5 +9,5 @@ export type PopulatedPlan = {
   name: string;
   creatorId: string;
   planId: string;
-  restaurants: Restaurant[];
+  restaurants: (Restaurant & { avgRating: number })[];
 };

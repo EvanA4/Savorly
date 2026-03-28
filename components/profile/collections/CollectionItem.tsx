@@ -1,15 +1,16 @@
-import Rating from "@mui/material/Rating";
+import Rating from "../../rest/Rating";
 import Link from "next/link";
 
 type CollectionItemProps = {
   RestaurantId: string;
   RestaurantName: string;
+  RestaurantRating: number;
 };
 export default function CollectionItem({
   RestaurantId,
   RestaurantName,
+  RestaurantRating,
 }: CollectionItemProps) {
-  const rating = 2.5; //also query eventually
   return (
     <Link href={`/restaurant?id=${RestaurantId}`}>
       <div className="ml-6 flex items-center justify-between rounded-lg border hover:shadow-sm transition-all">
@@ -17,7 +18,7 @@ export default function CollectionItem({
           {RestaurantName}
         </span>
         <div className="ml-2 pr-3 shrink-0 md:pr-7">
-          <Rating readOnly value={2.5} precision={0.5} />
+          <Rating value={RestaurantRating} />
         </div>
       </div>
     </Link>
