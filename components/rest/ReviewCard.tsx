@@ -30,6 +30,8 @@ function ReviewCard(props: {
         const images = imagesRes.unwrap();
         if (images.length) {
           setImageSrc(`/api/images?_id=${images[0]._id!}`);
+        } else {
+          setImageSrc("");
         }
       }
 
@@ -41,6 +43,8 @@ function ReviewCard(props: {
         }
       }
     })();
+
+    console.log(props.review);
   }, [props.review, username]);
 
   return (

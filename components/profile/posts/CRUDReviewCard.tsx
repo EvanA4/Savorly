@@ -32,6 +32,8 @@ function CRUDReviewCard(props: {
         const images = res.unwrap();
         if (images.length) {
           setImageSrc(`/api/images?_id=${images[0]._id!}`);
+        } else {
+          setImageSrc("");
         }
       }
     })();
