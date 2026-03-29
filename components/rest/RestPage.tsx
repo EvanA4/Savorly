@@ -113,8 +113,8 @@ function RestPage() {
   return (
     <div className="min-h-full flex flex-col gap-5 md:gap-10">
       {/* User's search parameters */}
-      <div className="bg-[#f2f2f2] px-7 md:px-10 pt-[60px] border-b-2 border-b-neutral-200 pb-5 flex justify-between items-end">
-        <div>
+      <div className="bg-[#f2f2f2] px-7 md:px-10 pt-[60px] border-b-2 border-b-neutral-200 flex justify-between items-stretch">
+        <div className="pb-5">
           <p className="pt-5 text-2xl">{rest.name}</p>
           <div className="flex items-center gap-3 mt-3">
             <Rating value={restStats.avgRating} />
@@ -129,7 +129,7 @@ function RestPage() {
           </div>
         </div>
         {user && (
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-col justify-center sm:flex-row gap-2 items-center sm:items-end sm:pb-5">
             <Link
               className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
               href={`/posts?restaurantId=${searchParams.get("id")!}`}
