@@ -35,7 +35,7 @@ function ReadReviewModal(props: {
         setRest(restRes.unwrap());
       }
     })();
-  }, []);
+  }, [props.review]);
 
   return (
     <Modal visible={props.visible} setVisibile={props.setVisible} centered>
