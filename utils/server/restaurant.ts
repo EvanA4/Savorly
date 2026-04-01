@@ -1,7 +1,6 @@
 import { MapBoxResponse } from "@/types/mapbox/lookupResponse";
 import { Restaurant } from "@/types/restaurant";
 import { Result } from "@/types/results";
-import dbConnect from "../dbconnect";
 
 export async function getRestaurantById(
   id: string,
