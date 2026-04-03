@@ -50,6 +50,9 @@ function HomeSearch(props: {
           className="bg-white shadow-md outline-none p-3 w-full"
           placeholder="Search post, restaurant, user..."
           onChange={(e) => setSearchStr(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key == "Enter") handleSearch();
+          }}
         />
         <button
           className="bg-blue-300 hover:bg-blue-700 px-3 py-2 cursor-pointer text-white"

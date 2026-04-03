@@ -101,6 +101,9 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
             className="bg-white shadow-md outline-none px-3 py-2 w-full"
             placeholder="Enter restaurant..."
             onChange={(e) => setSearchStr(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key == "Enter") handleSearch();
+            }}
           />
           <button
             className="bg-neutral-100 hover:bg-neutral-200 px-3 py-2 cursor-pointer text-white"
