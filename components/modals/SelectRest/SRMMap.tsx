@@ -27,6 +27,8 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
   const [isMarkerOpen, setIsMarkerOpen] = useState<boolean>(false);
   const [map, setMap] = useState<Map | undefined>(undefined);
   const [showTips, setShowTips] = useState(true);
+  const [showCuisines, setShowCuisines] = useState(false);
+  const [cuisinesJustClosed, setCuisinesJustClosed] = useState(false);
 
   function getTipMsg() {
     if (rests.length == 0) return "Click the map or use the search bar!";
@@ -69,7 +71,7 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
   }
 
   async function handleClick(mouseLat: number, mouseLng: number) {
-    if (!isMarkerOpen) {
+    if (!isMarkerOpen && !cuisinesJustClosed) {
       const toSend = {
         searchStr: "",
         lat: mouseLat,
@@ -81,6 +83,7 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
       };
       refreshRests(toSend);
     }
+    setCuisinesJustClosed(false);
   }
 
   async function handlePopupOpen() {
@@ -118,6 +121,13 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
               options={cuisines}
               selected={selCuisine}
               setSelected={setSelCuisine}
+              showOptions={showCuisines}
+              setShowOptions={(handler) => {
+                setShowCuisines((prev) => {
+                  if (prev) setCuisinesJustClosed(true);
+                  return handler(prev);
+                });
+              }}
             />
           </div>
           {/* <MultiSelectDD

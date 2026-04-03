@@ -54,7 +54,12 @@ function TopNav() {
       ) {
         setShowSignIn((prev) => !prev);
       } else {
-        setShowSignIn(false);
+        setShowSignIn((prev) => {
+          if (prev) {
+            ev.stopPropagation();
+          }
+          return false;
+        });
       }
     }
   }

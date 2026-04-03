@@ -1,14 +1,15 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 // Multi-select drop-down input
 function SingleSelectDD(props: {
   options: string[];
   selected: number;
   setSelected: React.Dispatch<React.SetStateAction<number>>;
+  showOptions: boolean;
+  setShowOptions: (handler: (prev: boolean) => boolean) => void;
 }) {
-  const { options, selected, setSelected } = props;
-  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const { options, selected, setSelected, showOptions, setShowOptions } = props;
 
   const divRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -20,7 +21,12 @@ function SingleSelectDD(props: {
       !divRef.current.contains(ev.target as Node) &&
       ev.target != btnRef.current
     ) {
-      setShowOptions(false);
+      setShowOptions((prev) => {
+        if (prev) {
+          ev.stopPropagation();
+        }
+        return false;
+      });
     }
   }
 
