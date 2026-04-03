@@ -6,7 +6,6 @@ import TagSelect from "./TagSelect";
 import { PopulatedReview } from "@/types/review";
 import Image from "next/image";
 import { createReview, updateReview } from "@/utils/client/review";
-import { ReviewDocument } from "@/models/Review";
 import imageCompression from "browser-image-compression";
 import BudgetSelect from "./BudgetSelect";
 import RatingSelect from "./RatingSelect";
@@ -20,12 +19,9 @@ async function shrinkFile(file: File) {
   return await imageCompression(file, options);
 }
 
-function ReviewModal(props: {
+function CreateReviewModal(props: {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  review?: PopulatedReview;
-  setReview: React.Dispatch<React.SetStateAction<PopulatedReview | undefined>>;
-  setReviews: React.Dispatch<React.SetStateAction<ReviewDocument[]>>;
   restaurantId: string;
   userId: string;
 }) {
@@ -35,19 +31,7 @@ function ReviewModal(props: {
   const [ratingInput, setRatingInput] = useState<number>(2.5);
   const [budgetInput, setBudgetInput] = useState<number>(2);
   const [imagesInput, setImagesInput] = useState<File[]>([]);
-  const [prevImagesInput, setPrevImagesInput] = useState<boolean[]>([]);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (props.review) {
-      setTitleInput(props.review.title);
-      setTags(props.review.tags.map((val) => val.label as unknown as string));
-      setDescInput(props.review.description);
-      setRatingInput(props.review.rating);
-      setBudgetInput(props.review.budget);
-      setPrevImagesInput(Array(props.review.images.length).fill(true));
-    }
-  }, [props.review]);
 
   async function handleSubmit() {
     setSubmitting(true);
@@ -63,60 +47,13 @@ function ReviewModal(props: {
 
     let rev: PopulatedReview; // temporary review object
     if (props.userId && props.restaurantId) {
-      if (!props.review) {
-        const res = await createReview(props.userId, src);
-        const rerr = res.anticipate();
-        if (rerr.error) {
-          console.log(rerr.message);
-        } else {
-          rev = res.unwrap();
-          props.setReview(res.unwrap());
-          props.setReviews((prev) => [
-            ...prev,
-            {
-              _id: rev._id,
-              restaurantId: props.restaurantId,
-              title: titleInput,
-              description: descInput,
-              rating: ratingInput,
-              budget: budgetInput,
-            } as ReviewDocument,
-          ]);
-        }
+      const res = await createReview(props.userId, src);
+      const rerr = res.anticipate();
+      if (rerr.error) {
+        console.log(rerr.message);
       } else {
-        const res = await updateReview({
-          _id: props.review._id.toString(),
-          ...src,
-          imagesToDelete: props.review.images.filter(
-            (_, idx) => !prevImagesInput[idx],
-          ),
-        });
-        const rerr = res.anticipate();
-        if (rerr.error) {
-          console.log(rerr.message);
-        } else {
-          rev = res.unwrap();
-          setPrevImagesInput(Array(rev.images.length).fill(true));
-          setImagesInput([]);
-          props.setReview(rev);
-
-          props.setReviews((prev) =>
-            prev.map((val) =>
-              val._id.toString() !== rev._id.toString()
-                ? val
-                : ({
-                    _id: rev._id,
-                    restaurantId: props.restaurantId,
-                    title: titleInput,
-                    description: descInput,
-                    rating: ratingInput,
-                    budget: budgetInput,
-                  } as ReviewDocument),
-            ),
-          );
-        }
+        rev = res.unwrap();
       }
-
       props.setVisible(false);
     }
     setSubmitting(false);
@@ -149,38 +86,6 @@ function ReviewModal(props: {
         <TagSelect tags={tags} setTags={setTags} />
 
         <div>
-          {props.review && (
-            <div className="flex gap-1 mb-1">
-              {prevImagesInput.map((val, idx) => (
-                <div
-                  key={idx}
-                  className={
-                    "flex gap-3 px-3 py-1 bg-neutral-200 rounded-xl " +
-                    (val ? "" : "line-through")
-                  }
-                >
-                  {props.review!.images[idx]?.name}
-                  <button
-                    onClick={() =>
-                      setPrevImagesInput((prev) => {
-                        const output = [...prev];
-                        output[idx] = !output[idx];
-                        return output;
-                      })
-                    }
-                  >
-                    <Image
-                      src="/svgs/btrash.svg"
-                      width={16}
-                      height={16}
-                      alt="close"
-                      className="opacity-50 hover:opacity-70 cursor-pointer"
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
           <FileUploader
             onUpload={async (files) => {
               const compressed: File[] = [];
@@ -198,12 +103,12 @@ function ReviewModal(props: {
           <button
             className={
               "px-3 py-2 bg-blue-200 hover:bg-blue-300 rounded-lg " +
-              (submitting && "opacity-50")
+              (submitting && " opacity-50")
             }
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {props.review ? "Update" : "Submit"}
+            Submit
           </button>
         </div>
 
@@ -224,4 +129,4 @@ function ReviewModal(props: {
   );
 }
 
-export default ReviewModal;
+export default CreateReviewModal;

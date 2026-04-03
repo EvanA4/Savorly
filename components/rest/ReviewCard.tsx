@@ -43,8 +43,6 @@ function ReviewCard(props: {
         }
       }
     })();
-
-    console.log(props.review);
   }, [props.review, username]);
 
   return (

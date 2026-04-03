@@ -26,6 +26,7 @@ import ReadReviewModal from "../modals/Review/ReadReviewModal";
 import { MAPIUser } from "@/types/auth0/mapi_user";
 import { getUserById } from "@/utils/client/users";
 import AddToCollectionModal from "./AddToCollectionModal";
+import CreateReviewModal from "../modals/Review/CreateReviewModal";
 
 function RestPage() {
   const { user, isLoading } = useUser();
@@ -53,6 +54,7 @@ function RestPage() {
   const [showAddToCollection, setShowAddToCollection] = useState(false);
   const [showRRM, setShowRRM] = useState<boolean>(false);
   const uidMap = useRef<Map<string, MAPIUser>>(new Map<string, MAPIUser>());
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   async function fetchRest() {
     const restaurantRes = await getRestaurantById(searchParams.get("id")!);
@@ -130,11 +132,11 @@ function RestPage() {
         </div>
         {user && (
           <div className="flex flex-col justify-center sm:flex-row gap-2 items-center sm:items-end sm:pb-5">
-            <Link
+            <button
               className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
-              href={`/posts?restaurantId=${searchParams.get("id")!}`}
+              onClick={() => setShowReviewModal(true)}
             >
-              <p className="hidden xl:block">Manage Reviews</p>
+              <p className="hidden xl:block">Create Review</p>
               <span className="block xl:hidden">
                 <RateReviewOutlinedIcon
                   fontSize="medium"
@@ -142,7 +144,7 @@ function RestPage() {
                   titleAccess="Manage Reviews"
                 />
               </span>
-            </Link>
+            </button>
             <button
               className="px-2 py-2 bg-blue-200 hover:bg-blue-300 rounded-full xl:rounded-lg xl:px-3 xl:py-2"
               onClick={() => setShowAddToCollection(true)}
@@ -252,6 +254,14 @@ function RestPage() {
           userId={user.sub}
           restaurantId={searchParams.get("id")!}
           onClose={() => setShowAddToCollection(false)}
+        />
+      )}
+      {user?.sub && searchParams.get("id") && (
+        <CreateReviewModal
+          visible={showReviewModal}
+          setVisible={setShowReviewModal}
+          restaurantId={searchParams.get("id")!}
+          userId={user.sub}
         />
       )}
     </div>
