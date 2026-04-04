@@ -10,12 +10,15 @@ import { APIResult } from "@/types/results";
 
 function HomeSearch(props: {
   setReviews: Dispatch<SetStateAction<ReviewDocument[]>>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
 }) {
   const [searchStr, setSearchStr] = useState("");
   const [showSelectRest, setShowSelectRest] = useState(false);
   const router = useRouter();
 
   async function handleSearch() {
+    props.setIsLoading(true);
+    props.setReviews([]);
     if (!searchStr) {
       const rawRes = await fetch("/api/review");
       const apiRes = (await rawRes.json()) as APIResult<ReviewDocument[]>;
@@ -35,6 +38,7 @@ function HomeSearch(props: {
         props.setReviews(reviewsRes.unwrap());
       }
     }
+    props.setIsLoading(false);
   }
 
   async function handleMarkerClick(rest: Restaurant) {

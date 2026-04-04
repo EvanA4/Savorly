@@ -13,6 +13,7 @@ function PostSearch(props: {
   setReviews: React.Dispatch<React.SetStateAction<ReviewDocument[]>>;
   user: User | null | undefined;
   searchParams: ReadonlyURLSearchParams;
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [searchStr, setSearchStr] = useState("");
 
@@ -33,6 +34,8 @@ function PostSearch(props: {
 
   async function handleSearch() {
     if (props.user) {
+      props.setIsSearching(true);
+      props.setReviews([]);
       if (!searchStr) refreshPosts();
       else {
         const spget = props.searchParams.get("restaurantId");
@@ -48,6 +51,7 @@ function PostSearch(props: {
           props.setReviews(reviewsRes.unwrap());
         }
       }
+      props.setIsSearching(false);
     }
   }
 

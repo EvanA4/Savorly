@@ -97,46 +97,74 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
 
   return (
     <div className="h-full relative">
-      <div className="py-4 px-4 flex justify-between h-[30%] absolute top-0 left-0 w-full">
-        <div className="flex w-[60%] rounded-lg overflow-hidden shadow-md h-fit z-401">
-          <input
-            type="text"
-            className="bg-white shadow-md outline-none px-3 py-2 w-full"
-            placeholder="Enter restaurant..."
-            onChange={(e) => setSearchStr(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key == "Enter") handleSearch();
-            }}
-          />
-          <button
-            className="bg-neutral-100 hover:bg-neutral-200 px-3 py-2 cursor-pointer text-white"
-            onClick={handleSearch}
-          >
-            <Image src="/svgs/search.svg" width={20} height={20} alt="search" />
-          </button>
-        </div>
-        <div className="w-[35%] flex flex-col gap-3">
-          <div className="shadow-md z-[402]">
-            <SingleSelectDD
-              options={cuisines}
-              selected={selCuisine}
-              setSelected={setSelCuisine}
-              showOptions={showCuisines}
-              setShowOptions={(handler) => {
-                setShowCuisines((prev) => {
-                  if (prev) setCuisinesJustClosed(true);
-                  return handler(prev);
-                });
+      <div className="absolute top-0 left-0 w-full z-402">
+        <div className="py-4 px-4 flex justify-between">
+          <div className="flex w-[60%] rounded-lg overflow-hidden shadow-md h-fit z-401">
+            <input
+              type="text"
+              className="bg-white shadow-md outline-none px-3 py-2 w-full"
+              placeholder="Enter restaurant..."
+              onChange={(e) => setSearchStr(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key == "Enter") handleSearch();
               }}
             />
+            <button
+              className="bg-neutral-100 hover:bg-neutral-200 px-3 py-2 cursor-pointer text-white"
+              onClick={handleSearch}
+            >
+              <Image
+                src="/svgs/search.svg"
+                width={20}
+                height={20}
+                alt="search"
+              />
+            </button>
           </div>
-          {/* <MultiSelectDD
-            options={restrictions}
-            selected={selRestricts}
-            setSelected={setSelRestricts}
-            formatStr="%d restriction(s)"
-          /> */}
+          <div className="w-[35%] flex flex-col gap-3">
+            <div className="shadow-md z-[402]">
+              <SingleSelectDD
+                options={cuisines}
+                selected={selCuisine}
+                setSelected={setSelCuisine}
+                showOptions={showCuisines}
+                setShowOptions={(handler) => {
+                  setShowCuisines((prev) => {
+                    if (prev) setCuisinesJustClosed(true);
+                    return handler(prev);
+                  });
+                }}
+              />
+            </div>
+            {/* <MultiSelectDD
+              options={restrictions}
+              selected={selRestricts}
+              setSelected={setSelRestricts}
+              formatStr="%d restriction(s)"
+            /> */}
+          </div>
         </div>
+
+        {showTips && (
+          <div className="opacity-80 px-4">
+            <div className="w-full bg-neutral-100 px-3 py-2 rounded-lg grid grid-cols-10 shadow-lg">
+              <div className="col-span-9">{getTipMsg()}</div>
+
+              <button
+                className="flex justify-center items-center"
+                onClick={() => setShowTips(false)}
+              >
+                <Image
+                  src="/svgs/close.svg"
+                  width={16}
+                  height={16}
+                  alt="close"
+                  className="opacity-50 hover:opacity-70 cursor-pointer"
+                />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="h-full">
@@ -166,27 +194,6 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
           />
         </MapContainer>
       </div>
-
-      {showTips && (
-        <div className="absolute bottom-0 left-0 w-full z-400 flex justify-center pb-3 opacity-80">
-          <div className="w-[90%] bg-neutral-100 px-3 py-2 rounded-lg grid grid-cols-10 shadow-lg">
-            <div className="col-span-9">{getTipMsg()}</div>
-
-            <button
-              className="flex justify-center items-center"
-              onClick={() => setShowTips(false)}
-            >
-              <Image
-                src="/svgs/close.svg"
-                width={16}
-                height={16}
-                alt="close"
-                className="opacity-50 hover:opacity-70 cursor-pointer"
-              />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

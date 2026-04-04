@@ -13,6 +13,7 @@ import ReviewModal from "@/components/modals/Review/ReviewModal";
 function PostsPage() {
   const [popReview, setPopReview] = useState<PopulatedReview | undefined>();
   const [reviews, setReviews] = useState<ReviewDocument[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [rest, setRest] = useState<Restaurant | undefined>();
   const [showReviewModal, setShowReviewModal] = useState(false);
   const { user, isLoading } = useUser();
@@ -32,6 +33,7 @@ function PostsPage() {
       {/* User's search parameters */}
       <PostSearch
         setReviews={setReviews}
+        setIsSearching={setIsSearching}
         user={user}
         searchParams={searchParams}
       />
@@ -58,6 +60,7 @@ function PostsPage() {
           searchParams={searchParams}
           user={user}
           isLoading={isLoading}
+          isSearching={isSearching}
           router={router}
           setShowReviewModal={setShowReviewModal}
           rest={rest}

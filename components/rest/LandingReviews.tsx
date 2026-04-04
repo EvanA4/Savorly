@@ -12,6 +12,7 @@ import { getUserById } from "@/utils/client/users";
 function LandingReviews(props: {
   reviews: ReviewDocument[];
   setReviews: Dispatch<SetStateAction<ReviewDocument[]>>;
+  isLoading: boolean;
 }) {
   const [selReview, setSelReview] = useState<PopulatedReview | undefined>(
     undefined,
@@ -40,7 +41,9 @@ function LandingReviews(props: {
   return (
     <>
       {props.reviews.length == 0 && (
-        <p className="text-center w-full">Loading...</p>
+        <p className="text-center w-full">
+          {props.isLoading ? "Loading..." : "No reviews, try creating one!"}
+        </p>
       )}
       {props.reviews.map((val, idx) => {
         return (

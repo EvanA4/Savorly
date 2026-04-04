@@ -23,6 +23,7 @@ function PostList(props: {
   >;
   user: User | null | undefined;
   isLoading: boolean;
+  isSearching: boolean;
   router: AppRouterInstance;
   searchParams: ReadonlyURLSearchParams;
   setShowReviewModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -126,7 +127,7 @@ function PostList(props: {
     </div>
   ) : (
     <p className="text-center text-neutral-700">
-      No results, maybe create a review?
+      {props.isSearching ? "Loading..." : "No reviews, try creating one!"}
     </p>
   );
 }
