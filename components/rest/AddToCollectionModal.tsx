@@ -100,9 +100,9 @@ export default function AddToCollectionModal({
             href="/collections"
             className="flex flex-col items-center gap-1 mt-4 mb-4"
           >
-            <p className="text-m text-gray-400">You have no collections yet.</p>
+            <p className="text-m text-gray-400">You have no collections yet</p>
             <p className="text-m text-gray-400">
-              Click here to go to the Collections page.
+              Click here to go to the Collections page
             </p>
           </Link>
         ) : (
