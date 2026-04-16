@@ -52,7 +52,7 @@ function HomeSearch(props: {
         <input
           type="text"
           className="bg-white shadow-md outline-none p-3 w-full"
-          placeholder="Search posts"
+          placeholder="Search other's posts"
           onChange={(e) => setSearchStr(e.target.value)}
           onKeyDown={(e) => {
             if (e.key == "Enter") handleSearch();
