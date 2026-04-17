@@ -47,12 +47,12 @@ function HomeSearch(props: {
 
   return (
     <div className="bg-[#f2f2f2] px-10 pt-[60px] border-b-2 border-b-neutral-200 pb-5">
-      <p className="pt-5 text-2xl">Find the best restaurants and food spots.</p>
+      <p className="pt-5 text-2xl">Find the best restaurants and food spots</p>
       <div className="flex w-full xl:w-[50%] rounded-xl overflow-hidden mt-2">
         <input
           type="text"
           className="bg-white shadow-md outline-none p-3 w-full"
-          placeholder="Search post, restaurant, user..."
+          placeholder="Search other's posts"
           onChange={(e) => setSearchStr(e.target.value)}
           onKeyDown={(e) => {
             if (e.key == "Enter") handleSearch();

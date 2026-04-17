@@ -103,7 +103,7 @@ function SRMMap(props: { onMarkerClick: (rest: Restaurant) => Promise<void> }) {
             <input
               type="text"
               className="bg-white shadow-md outline-none px-3 py-2 w-full"
-              placeholder="Enter restaurant..."
+              placeholder="Search restaurant"
               onChange={(e) => setSearchStr(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key == "Enter") handleSearch();

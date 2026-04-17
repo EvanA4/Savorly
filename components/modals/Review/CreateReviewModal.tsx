@@ -28,7 +28,7 @@ function CreateReviewModal(props: {
   const [tags, setTags] = useState<string[]>([]);
   const [titleInput, setTitleInput] = useState<string>("");
   const [descInput, setDescInput] = useState<string>("");
-  const [ratingInput, setRatingInput] = useState<number>(2.5);
+  const [ratingInput, setRatingInput] = useState<number>(0);
   const [budgetInput, setBudgetInput] = useState<number>(2);
   const [imagesInput, setImagesInput] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);

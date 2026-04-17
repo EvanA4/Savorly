@@ -57,12 +57,12 @@ function PostSearch(props: {
 
   return (
     <div className="bg-[#f2f2f2] px-10 pt-15 border-b-2 border-b-neutral-200 pb-5">
-      <p className="pt-5 text-2xl">Find posts or restaurants.</p>
+      <p className="pt-5 text-2xl">Find posts or restaurants</p>
       <div className="flex w-full rounded-xl overflow-hidden mt-2">
         <input
           type="text"
           className="bg-white shadow-md outline-none p-3 w-full "
-          placeholder="Search posts or resturants..."
+          placeholder="Search posts"
           onChange={(e) => setSearchStr(e.target.value)}
           onKeyDown={(e) => {
             if (e.key == "Enter") handleSearch();
