@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 // POST (create new plan)
 export const POST = async function (
   req: NextRequest,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   await dbConnect();
 
@@ -69,7 +69,7 @@ export const POST = async function (
 // GET (get all of a user's plans as populatedPlans)
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ): Promise<NextResponse<APIResult<PopulatedPlan[]>>> {
   await dbConnect();
 

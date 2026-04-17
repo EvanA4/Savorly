@@ -5,18 +5,19 @@ import { NextRequest, NextResponse } from "next/server";
 // accept an existing friend request
 export const PUT = async function (
   req: NextRequest,
-  { params }: { params: { friendRequestId: string } },
+  { params }: { params: Promise<{ friendRequestId: string }> },
 ) {
   await dbConnect();
+  const friendRequestId = await params;
 
-  if (!params.friendRequestId)
+  if (!friendRequestId)
     return NextResponse.json(
       { message: "Friend ID required" },
       { status: 400 },
     );
 
   const friend = await FriendModel.findOneAndUpdate(
-    { _id: params.friendRequestId },
+    { _id: friendRequestId },
     { status: true },
     { new: true },
   );
@@ -30,18 +31,19 @@ export const PUT = async function (
 // unsending a friend request or denying a friend request
 export const DELETE = async function (
   req: NextRequest,
-  { params }: { params: { friendRequestId: string } },
+  { params }: { params: Promise<{ friendRequestId: string }> },
 ) {
   await dbConnect();
+  const { friendRequestId } = await params;
 
-  if (!params.friendRequestId)
+  if (!friendRequestId)
     return NextResponse.json(
       { message: "Friend ID required" },
       { status: 400 },
     );
 
   const friend = await FriendModel.findOneAndDelete({
-    _id: params.friendRequestId,
+    _id: friendRequestId,
   });
 
   if (!friend)

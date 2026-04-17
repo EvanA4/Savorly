@@ -6,17 +6,19 @@ import { NextRequest, NextResponse } from "next/server";
 // Get the friend relationship between two users
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { userId: string; user2Id: string } },
+  { params }: { params: Promise<{ userId: string; user2Id: string }> },
 ) {
   await dbConnect();
 
-  if (!params.userId)
+  const { userId, user2Id } = await params;
+
+  if (!userId)
     return NextResponse.json({ message: "User ID required" }, { status: 400 });
 
   const friend = await FriendModel.find({
     $or: [
-      { requestorId: params.userId, receiverId: params.user2Id },
-      { requestorId: params.user2Id, receiverId: params.userId },
+      { requestorId: userId, receiverId: user2Id },
+      { requestorId: user2Id, receiverId: userId },
     ],
   });
 
@@ -33,19 +35,20 @@ export const GET = async function (
 // the first one must be the requestor and the second one must be the receiver
 export const POST = async function (
   req: NextRequest,
-  { params }: { params: { userId: string; user2Id: string } },
+  { params }: { params: Promise<{ userId: string; user2Id: string }> },
 ) {
   await dbConnect();
+  const { userId, user2Id } = await params;
 
   // verify that both userId and user2Id are present
-  if (!params.userId || !params.user2Id)
+  if (!userId || !user2Id)
     return NextResponse.json(
       { message: "Requestor User ID and Receiver User ID required" },
       { status: 400 },
     );
 
   // verify that the requestor and receiver user IDs are not the same
-  if (params.userId == params.user2Id)
+  if (userId == user2Id)
     return NextResponse.json(
       { message: "Requestor and Receiver User IDs cannot be the same" },
       { status: 400 },
@@ -63,8 +66,8 @@ export const POST = async function (
   // verify that the friend relationship does not already exist
   const existing = await FriendModel.findOne({
     $or: [
-      { requestorId: params.userId, receiverId: params.user2Id },
-      { requestorId: params.user2Id, receiverId: params.userId },
+      { requestorId: userId, receiverId: user2Id },
+      { requestorId: user2Id, receiverId: userId },
     ],
   });
   if (existing)
@@ -74,8 +77,8 @@ export const POST = async function (
     );
 
   const friend = await FriendModel.insertOne({
-    requestorId: params.userId,
-    receiverId: params.user2Id,
+    requestorId: userId,
+    receiverId: user2Id,
     status: false,
   });
 

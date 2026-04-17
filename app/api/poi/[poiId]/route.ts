@@ -9,7 +9,7 @@ declare global {
 
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { poiId: string } },
+  { params }: { params: Promise<{ poiId: string }> },
 ): Promise<NextResponse<APIResult<Restaurant>>> {
   const { poiId } = await params;
 

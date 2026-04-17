@@ -16,7 +16,7 @@ import { APIResult } from "@/types/results";
 // POST (add restaurant to plan)
 export const POST = async function (
   req: NextRequest,
-  { params }: { params: { planId: string; restaurantId: string } },
+  { params }: { params: Promise<{ planId: string; restaurantId: string }> },
 ) {
   await dbConnect();
 
@@ -106,7 +106,7 @@ export const POST = async function (
 // DELETE (remove restaurant from plan)
 export const DELETE = async function (
   req: NextRequest,
-  { params }: { params: { planId: string; restaurantId: string } },
+  { params }: { params: Promise<{ planId: string; restaurantId: string }> },
 ) {
   await dbConnect();
 
@@ -174,7 +174,7 @@ export const DELETE = async function (
 // GET (Verify if restaurant is in the plan)
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { planId: string; restaurantId: string } },
+  { params }: { params: Promise<{ planId: string; restaurantId: string }> },
 ): Promise<NextResponse<APIResult<PlanRestaurantDocument>>> {
   await dbConnect();
 

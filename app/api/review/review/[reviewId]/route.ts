@@ -13,7 +13,7 @@ import { APIResult } from "@/types/results";
 // [PUT] Modify review with review ID and userID using body data
 export const PUT = async function (
   req: NextRequest,
-  { params }: { params: { reviewId: string } },
+  { params }: { params: Promise<{ reviewId: string }> },
 ): Promise<NextResponse<APIResult<PopulatedReview>>> {
   await dbConnect();
   const { reviewId } = await params;
@@ -180,7 +180,7 @@ export const PUT = async function (
 // [DELETE] Delete review under userID with reviewID
 export const DELETE = async function (
   _: NextRequest,
-  { params }: { params: { userId: string; reviewId: string } },
+  { params }: { params: Promise<{ reviewId: string }> },
 ): Promise<NextResponse<APIResult<ReviewDocument>>> {
   await dbConnect();
   const { reviewId } = await params;
@@ -214,7 +214,7 @@ export const DELETE = async function (
 // [GET] Get list of all existing review IDs from userID
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { reviewId: string } },
+  { params }: { params: Promise<{ reviewId: string }> },
 ): Promise<NextResponse<APIResult<ReviewDocument>>> {
   const { reviewId } = await params;
 

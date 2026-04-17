@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 // [GET] Get list of all existing review IDs from userID
 export const GET = async function (
   _: NextRequest,
-  { params }: { params: { restId: string } },
+  { params }: { params: Promise<{ restId: string }> },
 ): Promise<NextResponse<APIResult<ReviewDocument[]>>> {
   const { restId } = await params;
 

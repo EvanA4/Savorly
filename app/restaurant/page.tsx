@@ -1,11 +1,13 @@
 import Nav from "@/components/general/Nav";
 import RestPage from "@/components/rest/RestPage";
-import React from "react";
+import React, { Suspense } from "react";
 
 function Profile() {
   return (
     <div className="h-full relative">
-      <RestPage />
+      <Suspense>
+        <RestPage />
+      </Suspense>
       <Nav />
     </div>
   );

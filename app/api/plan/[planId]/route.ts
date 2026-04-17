@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 // DELETE (delete plan)
 export const DELETE = async function (
   req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ) {
   await dbConnect();
 
@@ -45,7 +45,7 @@ export const DELETE = async function (
 // GET (get all restaurants in a plan)
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ): Promise<NextResponse<APIResult<Restaurant[]>>> {
   await dbConnect();
 
@@ -109,7 +109,7 @@ export const GET = async function (
 // PUT (update plan name)
 export const PUT = async function (
   req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ): Promise<NextResponse<APIResult<PlanDocument>>> {
   await dbConnect();
 

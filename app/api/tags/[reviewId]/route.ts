@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // [GET] Get list of all existing review IDs from userID
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { reviewId: string } },
+  { params }: { params: Promise<{ reviewId: string }> },
 ) {
   await dbConnect();
   const { reviewId } = await params;

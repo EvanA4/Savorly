@@ -22,7 +22,7 @@ restaurantId
 // [POST] Add a review under userID with data in body
 export const POST = async function (
   req: NextRequest,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   await dbConnect();
   const { userId } = await params;
@@ -200,7 +200,7 @@ export const POST = async function (
 // [GET] Get list of all existing review IDs from userID
 export const GET = async function (
   req: NextRequest,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ): Promise<NextResponse<APIResult<ReviewDocument[]>>> {
   await dbConnect();
   const { userId } = await params;
