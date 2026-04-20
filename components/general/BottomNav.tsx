@@ -15,11 +15,11 @@ const LINK_DATA = [
     displayStr: "Collections",
     svgSrc: "/svgs/heart.svg",
   },
-  {
-    pathname: "/friends",
-    displayStr: "Friends",
-    svgSrc: "/svgs/friends.svg",
-  },
+  // {
+  //   pathname: "/friends",
+  //   displayStr: "Friends",
+  //   svgSrc: "/svgs/friends.svg",
+  // },
   {
     pathname: "/posts",
     displayStr: "Posts",

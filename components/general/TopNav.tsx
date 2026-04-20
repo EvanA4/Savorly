@@ -14,10 +14,10 @@ const LINK_DATA = [
     pathname: "/collections",
     displayStr: "Collections",
   },
-  {
-    pathname: "/friends",
-    displayStr: "Friends",
-  },
+  // {
+  //   pathname: "/friends",
+  //   displayStr: "Friends",
+  // },
   {
     pathname: "/posts",
     displayStr: "Posts",
@@ -142,14 +142,14 @@ function TopNav() {
               className={
                 "absolute w-full bottom-0 right-0 translate-y-[100%] rounded-b-2xl shadow-2xl transition-all duration-200 overflow-hidden"
               }
-              style={{ height: showSignIn ? "80px" : "0" }}
+              style={{ height: showSignIn ? "40px" : "0" }}
             >
-              <a
+              {/* <a
                 href={"/profile"}
                 className="block bg-neutral-200 hover:bg-neutral-300 w-full text-center py-2"
               >
                 Account
-              </a>
+              </a> */}
               <a
                 href={isLoading ? "" : user ? "/auth/logout" : "/auth/login"}
                 className="block bg-neutral-200 hover:bg-neutral-300 w-full text-center py-2"
